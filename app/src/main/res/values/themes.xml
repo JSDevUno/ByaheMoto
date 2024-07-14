@@ -3,6 +3,7 @@
     <style name="Base.Theme.ByaheMoto" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="Theme.ByaheMoto" parent="Base.Theme.ByaheMoto" />

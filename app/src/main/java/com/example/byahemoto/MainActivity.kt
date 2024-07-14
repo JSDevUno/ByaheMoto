@@ -1,10 +1,12 @@
 package com.example.byahemoto
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import com.example.byahemoto.databinding.ActivityMainBinding
 
@@ -28,5 +30,10 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Login Failed!", Toast.LENGTH_SHORT).show()
             }
         })
+        val createAccountTextView = findViewById<TextView>(R.id.createAccount)
+        createAccountTextView.setOnClickListener {
+            val intent = Intent(this, CreateAccount::class.java)
+            startActivity(intent)
+        }
     }
 }
