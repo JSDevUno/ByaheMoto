@@ -12,4 +12,9 @@
         <item name="android:textSize">14sp</item> <!-- Adjust the text size as needed -->
         <item name="android:textColor">@color/field</item> <!-- Optional: Adjust text color -->
     </style>
+    <style name="customBot">
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">12sp</item>
+    </style>
 </resources>

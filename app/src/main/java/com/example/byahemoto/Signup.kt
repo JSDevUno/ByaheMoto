@@ -27,6 +27,13 @@ class Signup : AppCompatActivity() {
             intent.type = "*/*"
             startActivityForResult(intent, FILE_PICKER_REQUEST)
         }
+
+        val createAcc = findViewById<Button>(R.id.createAcc1)
+
+        createAcc.setOnClickListener {
+            val intent = Intent(this, UserDashboard::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

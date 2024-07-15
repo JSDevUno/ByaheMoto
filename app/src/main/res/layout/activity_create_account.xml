@@ -79,7 +79,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/custom_panel"
             android:backgroundTint="@color/white"
-            android:drawableLeft="@drawable/baseline_person_24"
+            android:drawableLeft="@drawable/baseline_person_gray"
             android:drawablePadding="8dp"
             android:fontFamily="@font/montserrat_alternates_light"
             android:hint="FullName"
