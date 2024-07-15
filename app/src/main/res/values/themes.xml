@@ -7,4 +7,9 @@
     </style>
 
     <style name="Theme.ByaheMoto" parent="Base.Theme.ByaheMoto" />
+
+    <style name="MyHintTextAppearance" parent="TextAppearance.Design.Hint">
+        <item name="android:textSize">14sp</item> <!-- Adjust the text size as needed -->
+        <item name="android:textColor">@color/field</item> <!-- Optional: Adjust text color -->
+    </style>
 </resources>

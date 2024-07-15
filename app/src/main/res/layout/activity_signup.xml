@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/bg"
     tools:context=".Signup">
 
     <View
@@ -55,65 +56,85 @@
         android:layout_height="704dp"
         android:layout_below="@id/topPanel"
         android:layout_gravity="bottom"
-        android:background="@drawable/custom_panel"
         android:orientation="vertical"
         android:padding="29dp">
 
         <EditText
             android:id="@+id/fullName1"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="55dp"
             android:layout_marginTop="0dp"
             android:background="@drawable/custom_panel"
-            android:backgroundTint="#e8e8e8"
+            android:backgroundTint="@color/white"
             android:drawableLeft="@drawable/baseline_person_24"
             android:drawablePadding="8dp"
             android:fontFamily="@font/montserrat_alternates_light"
             android:hint="FullName"
-            android:padding="8dp"
+            android:paddingLeft="18dp"
             android:textColor="@color/black" />
         <EditText
             android:id="@+id/username1"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="55dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/custom_panel"
-            android:backgroundTint="#e8e8e8"
+            android:backgroundTint="@color/white"
             android:drawableLeft="@drawable/baseline_drive_file_rename_outline_24"
             android:drawablePadding="8dp"
             android:fontFamily="@font/montserrat_alternates_light"
             android:hint="Username"
-            android:padding="8dp"
+            android:paddingLeft="18dp"
             android:textColor="@color/black" />
 
-        <EditText
-            android:id="@+id/password1"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordInputLayout"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/custom_panel"
-            android:backgroundTint="#e8e8e8"
-            android:drawableLeft="@drawable/baseline_lock_24"
-            android:drawablePadding="8dp"
-            android:fontFamily="@font/montserrat_alternates_light"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:hint="Password"
-            android:inputType="textPassword"
-            android:padding="8dp"
-            android:textColor="@color/black" />
-        <EditText
-            android:id="@+id/confirmpassword1"
+            android:animateLayoutChanges="true"
+            android:textColorHint="@color/field"
+            app:passwordToggleEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:drawableStart="@drawable/baseline_lock_24"
+                android:drawablePadding="12dp"
+                android:backgroundTint="@color/white"
+                android:background="@drawable/custom_panel"
+                android:textColor="@color/black"
+                android:fontFamily="@font/montserrat_alternates_light"
+                android:paddingRight="40dp"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordInputLayout2"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/custom_panel"
-            android:backgroundTint="#e8e8e8"
-            android:drawableLeft="@drawable/baseline_lock_24"
-            android:drawablePadding="8dp"
-            android:fontFamily="@font/montserrat_alternates_light"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:hint="Confirm Password"
-            android:inputType="textPassword"
-            android:padding="8dp"
-            android:textColor="@color/black" />
+            android:textColorHint="@color/field"
+            app:passwordToggleEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordEditText2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:drawableStart="@drawable/baseline_lock_24"
+                android:drawablePadding="12dp"
+                android:backgroundTint="@color/white"
+                android:background="@drawable/custom_panel"
+                android:textColor="@color/black"
+                android:fontFamily="@font/montserrat_alternates_light"
+                android:paddingRight="40dp"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <EditText
             android:id="@+id/email1"
@@ -121,25 +142,25 @@
             android:layout_height="70dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/custom_panel"
-            android:backgroundTint="#e8e8e8"
+            android:backgroundTint="@color/white"
             android:drawableLeft="@drawable/baseline_personal_injury_24"
             android:drawablePadding="8dp"
             android:fontFamily="@font/montserrat_alternates_light"
             android:hint="Student, Senior and PWD’s palagay ng tatlong option"
-            android:padding="8dp"
+            android:paddingLeft="18dp"
             android:textColor="@color/black" />
         <EditText
             android:id="@+id/idVerification"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="55dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/custom_panel"
-            android:backgroundTint="#e8e8e8"
+            android:backgroundTint="@color/white"
             android:drawableLeft="@drawable/baseline_add_card_24"
             android:drawablePadding="8dp"
             android:fontFamily="@font/montserrat_alternates_light"
             android:hint="ID Verification"
-            android:padding="8dp"
+            android:paddingLeft="18dp"
             android:textColor="@color/black" />
 
         <Button
