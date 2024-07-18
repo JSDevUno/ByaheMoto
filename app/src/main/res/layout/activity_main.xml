@@ -45,6 +45,26 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_end="20dp" />
 
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline3"
+        app:layout_constraintBottom_toTopOf="@id/titleBM"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:padding="20dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/tryc" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/titleBM"
         android:layout_width="wrap_content"
@@ -78,6 +98,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="@drawable/custom_panel"
+            android:layout_marginTop="-30dp"
             android:orientation="vertical"
             android:padding="29dp">
 

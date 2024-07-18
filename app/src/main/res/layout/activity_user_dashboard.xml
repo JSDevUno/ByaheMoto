@@ -66,9 +66,9 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_directions_car_filled_24" />
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/emc" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -92,9 +92,9 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_directions_car_filled_24" />
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ecart" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -118,9 +118,9 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_directions_car_filled_24" />
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/emc" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -144,9 +144,9 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/baseline_directions_car_filled_24" />
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/tryc1" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -192,11 +192,11 @@
 
     <ImageView
         android:id="@+id/backBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="24dp"
-        android:src="@drawable/baseline_arrow_back_ios_24"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/tryc1"
         app:layout_constraintStart_toStartOf="@+id/topPanel"
         app:layout_constraintTop_toTopOf="parent" />
 
