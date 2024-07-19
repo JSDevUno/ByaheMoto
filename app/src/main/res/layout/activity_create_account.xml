@@ -34,11 +34,11 @@
             android:layout_centerInParent="true"
             android:fontFamily="@font/montserrat"
             android:paddingTop="50dp"
-            android:text="CREATE YOUR ACCOUNT"
+            android:text="CREATE COMMUTER ACCOUNT"
             android:textAlignment="center"
             android:textAppearance="@style/Base.Theme.ByaheMoto"
             android:textColor="@color/white"
-            android:textSize="34sp" />
+            android:textSize="28sp" />
     </RelativeLayout>
 
     <LinearLayout
