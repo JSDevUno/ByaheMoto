@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".launch">
+    tools:context=".MainLauncher">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -13,32 +13,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            app:srcCompat="@drawable/tryc1"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="0dp" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="300dp"
             android:layout_height="match_parent"
             android:text="ByaheMoto!"
             android:fontFamily="@font/archivo_black"
             android:textAlignment="center"
-            android:textSize="40dp"
-            android:layout_marginTop="-20dp"/>
-        <TextView
-            android:layout_width="match_parent"
+            android:textSize="40dp" />
+        <Button
+            android:id="@+id/commuter"
+            android:layout_width="200dp"
             android:layout_height="match_parent"
             android:text="Commuter"
-            android:fontFamily="@font/montserrat"
-            android:textAlignment="center"
-            android:textSize="40dp"
-            android:layout_marginTop="-10dp"/>
+            android:fontFamily="@font/archivo_black" />
+        <Button
+            android:id="@+id/driver"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:text="Driver"
+            android:fontFamily="@font/archivo_black"/>
 
     </LinearLayout>
 

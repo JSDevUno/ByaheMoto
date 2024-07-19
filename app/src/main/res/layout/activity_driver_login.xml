@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".DriverLogin">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imageView1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
@@ -18,42 +18,42 @@
         app:srcCompat="@drawable/bguser" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline1"
+        android:id="@+id/guideline11"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_begin="20dp" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
+        android:id="@+id/guideline22"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_end="20dp" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
+        android:id="@+id/guideline33"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="20dp" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline4"
+        android:id="@+id/guideline44"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_end="20dp" />
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/linearLayout1"
         android:layout_width="400dp"
         android:layout_height="400dp"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guideline3"
-        app:layout_constraintBottom_toTopOf="@id/titleBM"
+        app:layout_constraintTop_toTopOf="@id/guideline33"
+        app:layout_constraintBottom_toTopOf="@id/titleBM1"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:gravity="center"
@@ -66,21 +66,21 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/titleBM"
+        android:id="@+id/titleBM1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="480dp"
         android:fontFamily="@font/archivo_black"
-        android:text="Commuter"
+        android:text="Driver"
         android:textColor="@color/black"
         android:textSize="48sp"
-        app:layout_constraintBottom_toTopOf="@+id/cardView"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
-        app:layout_constraintStart_toStartOf="@+id/guideline1"
-        app:layout_constraintTop_toTopOf="@id/guideline3" />
+        app:layout_constraintBottom_toTopOf="@+id/cardView1"
+        app:layout_constraintEnd_toStartOf="@+id/guideline22"
+        app:layout_constraintStart_toStartOf="@+id/guideline11"
+        app:layout_constraintTop_toTopOf="@id/guideline33" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+        android:id="@+id/cardView1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -88,12 +88,12 @@
         app:cardCornerRadius="30dp"
         app:cardElevation="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
-        app:layout_constraintStart_toStartOf="@+id/guideline1"
-        app:layout_constraintTop_toBottomOf="@+id/titleBM">
+        app:layout_constraintEnd_toStartOf="@+id/guideline22"
+        app:layout_constraintStart_toStartOf="@+id/guideline11"
+        app:layout_constraintTop_toBottomOf="@+id/titleBM1">
 
 
-    <LinearLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -103,7 +103,7 @@
             android:padding="29dp">
 
             <EditText
-                android:id="@+id/username"
+                android:id="@+id/usernameDriver"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="40dp"
@@ -117,7 +117,7 @@
                 android:textColor="@color/black" />
 
             <EditText
-                android:id="@+id/password"
+                android:id="@+id/passwordDriver"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
@@ -136,7 +136,7 @@
                 android:layout_marginTop="10dp">
 
                 <CheckBox
-                    android:id="@+id/remember_me_checkbox"
+                    android:id="@+id/rememberDriver"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
@@ -149,7 +149,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/forgot_password"
+                    android:id="@+id/forgotPassDriver"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="14dp"
@@ -164,7 +164,7 @@
 
 
             <Button
-                android:id="@+id/loginButton"
+                android:id="@+id/loginButtonDriver"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="0dp"
@@ -180,7 +180,7 @@
                 android:layout_marginTop="10dp">
 
                 <TextView
-                    android:id="@+id/noAccount"
+                    android:id="@+id/noAccount1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"
@@ -192,7 +192,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/createAccount"
+                    android:id="@+id/createAccountDriver"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="30dp"
