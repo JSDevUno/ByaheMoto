@@ -2,14 +2,18 @@ package com.example.byahemoto
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -26,8 +30,8 @@ import retrofit2.Response
 class CurrentFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var googleMap: GoogleMap
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val batangas = LatLng(13.7563, 121.0604)
-    private val bauang = LatLng(13.7963, 120.9762)
     private val apiKey = "AIzaSyA7TdMg8XawtIx9QX1uDGl2H_CSJU7IKpE"
 
     override fun onCreateView(
@@ -37,6 +41,7 @@ class CurrentFragment : Fragment(), OnMapReadyCallback {
         val view = inflater.inflate(R.layout.fragment_current, container, false)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         return view
     }
 
@@ -47,18 +52,32 @@ class CurrentFragment : Fragment(), OnMapReadyCallback {
             ActivityCompat.requestPermissions(requireActivity(),
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         } else {
-            // Use fixed location
+            // Get current location
             googleMap.isMyLocationEnabled = false
-            showLocation()
+            getCurrentLocation()
         }
     }
 
-    private fun showLocation() {
+    private fun getCurrentLocation() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    val currentLocation = LatLng(location.latitude, location.longitude)
+                    showLocation(currentLocation)
+                } else {
+                    Toast.makeText(requireContext(), "Unable to get current location.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun showLocation(currentLocation: LatLng) {
         googleMap.clear()
+        googleMap.addMarker(MarkerOptions().position(currentLocation).title("Current Location"))
         googleMap.addMarker(MarkerOptions().position(batangas).title("Batangas"))
-        googleMap.addMarker(MarkerOptions().position(bauang).title("Bauan"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(batangas, 10f))
-        fetchDirections(batangas, bauang)
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 10f))
+        fetchDirections(currentLocation, batangas)
     }
 
     private fun fetchDirections(start: LatLng, end: LatLng) {
@@ -146,7 +165,7 @@ class CurrentFragment : Fragment(), OnMapReadyCallback {
                 if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
                     googleMap.isMyLocationEnabled = true
-                    showLocation()
+                    getCurrentLocation()
                 }
             } else {
                 Log.d("PermissionError", "Location permission denied.")
