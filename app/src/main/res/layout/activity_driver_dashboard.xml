@@ -53,6 +53,7 @@
       android:id="@+id/fragment_layout"
       android:layout_width="0dp"
       android:layout_height="0dp"
+      android:background="@drawable/map_shape"
       app:layout_constraintTop_toBottomOf="@id/topPanelDriver"
       app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
       app:layout_constraintStart_toStartOf="parent"
