@@ -24,7 +24,26 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/api_key"/>
-
+        <activity
+            android:name=".Topup"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransacHistory"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Profile"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Wallet"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".History"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".DriverDashboard"
             android:exported="false"
