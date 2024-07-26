@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <item
+        android:id="@+id/nav_current"
+        android:icon="@drawable/baseline_my_location_24"
+        android:title="Current"/>
+
+    <item
+        android:id="@+id/nav_map"
+        android:icon="@drawable/baseline_map_24"
+        android:title="Map"/>
+
+    <item
+        android:id="@+id/nav_order"
+        android:icon="@drawable/baseline_list_alt_24"
+        android:title="Order"/>
+
+    <item
+        android:id="@+id/nav_menu"
+        android:icon="@drawable/baseline_menu_24"
+        android:title="Menu"/>
+
+</menu>

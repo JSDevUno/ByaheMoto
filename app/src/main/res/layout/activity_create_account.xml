@@ -28,27 +28,17 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="1dp"/>
 
-        <ImageView
-            android:id="@+id/menuBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/baseline_menu_24"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="1dp"/>
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:fontFamily="@font/montserrat"
             android:paddingTop="50dp"
-            android:text="CREATE YOUR ACCOUNT"
+            android:text="CREATE COMMUTER ACCOUNT"
             android:textAlignment="center"
             android:textAppearance="@style/Base.Theme.ByaheMoto"
             android:textColor="@color/white"
-            android:textSize="34sp" />
+            android:textSize="28sp" />
     </RelativeLayout>
 
     <LinearLayout
