@@ -29,7 +29,7 @@ class CreateAccount : AppCompatActivity() {
         setContentView(R.layout.activity_create_account)
 
         emailEditText = findViewById(R.id.email)
-        fullnameEditText = findViewById(R.id.fullname)  // Changed to fullname
+        fullnameEditText = findViewById(R.id.fullname)
         usernameEditText = findViewById(R.id.username)
         passwordEditText = findViewById(R.id.passwordEditText)
         confirmPasswordEditText = findViewById(R.id.passwordEditText2)
@@ -38,7 +38,7 @@ class CreateAccount : AppCompatActivity() {
 
         createAccButton.setOnClickListener {
             val email = emailEditText.text.toString().trim()
-            val fullname = fullnameEditText.text.toString().trim()  // Changed to fullname
+            val fullname = fullnameEditText.text.toString().trim()
             val username = usernameEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
             val confirmPassword = confirmPasswordEditText.text.toString().trim()
