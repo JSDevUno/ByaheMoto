@@ -13,11 +13,12 @@ import com.example.byahemoto.network.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.regex.Pattern
 
 class CreateAccount : AppCompatActivity() {
 
     private lateinit var emailEditText: EditText
-    private lateinit var fullnameEditText: EditText  // Changed to fullname
+    private lateinit var fullnameEditText: EditText
     private lateinit var usernameEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var confirmPasswordEditText: EditText
@@ -43,11 +44,7 @@ class CreateAccount : AppCompatActivity() {
             val password = passwordEditText.text.toString().trim()
             val confirmPassword = confirmPasswordEditText.text.toString().trim()
 
-            if (email.isEmpty() || fullname.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
-            } else if (password != confirmPassword) {
-                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
-            } else {
+            if (validateInputs(email, fullname, username, password, confirmPassword)) {
                 register(email, fullname, username, password, confirmPassword)
             }
         }
@@ -55,6 +52,35 @@ class CreateAccount : AppCompatActivity() {
         backBtn.setOnClickListener {
             onBackPressed()
         }
+    }
+
+    private fun validateInputs(email: String, fullname: String, username: String, password: String, confirmPassword: String): Boolean {
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        if (fullname.isEmpty()) {
+            Toast.makeText(this, "Full name is required", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        if (username.isEmpty() || !Pattern.matches("^[a-zA-Z0-9_]+$", username)) {
+            Toast.makeText(this, "Username must be alphanumeric with no spaces or special characters", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        if (password.isEmpty() || !Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$", password)) {
+            Toast.makeText(this, "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number", Toast.LENGTH_LONG).show()
+            return false
+        }
+
+        if (confirmPassword.isEmpty() || password != confirmPassword) {
+            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        return true
     }
 
     private fun register(email: String, fullname: String, username: String, password: String, confirmPassword: String) {
