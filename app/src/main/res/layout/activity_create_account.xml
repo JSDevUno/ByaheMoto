@@ -63,7 +63,7 @@
             android:textColor="@color/black" />
 
         <EditText
-            android:id="@+id/firstName"
+            android:id="@+id/fullname"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginTop="10dp"
@@ -72,21 +72,7 @@
             android:drawableLeft="@drawable/baseline_person_gray"
             android:drawablePadding="8dp"
             android:fontFamily="@font/montserrat_alternates_light"
-            android:hint="First Name"
-            android:paddingLeft="18dp"
-            android:textColor="@color/black" />
-
-        <EditText
-            android:id="@+id/lastName"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/custom_panel"
-            android:backgroundTint="@color/white"
-            android:drawableLeft="@drawable/baseline_person_gray"
-            android:drawablePadding="8dp"
-            android:fontFamily="@font/montserrat_alternates_light"
-            android:hint="Last Name"
+            android:hint="Full Name"
             android:paddingLeft="18dp"
             android:textColor="@color/black" />
 
@@ -164,16 +150,6 @@
             android:textSize="18sp"
             app:cornerRadius="50dp" />
 
-        <Button
-            android:id="@+id/createPriority"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="5dp"
-            android:backgroundTint="#0a9dea"
-            android:fontFamily="@font/montserrat_alternates_semibold"
-            android:text="Create Priority Account"
-            android:textSize="18sp"
-            app:cornerRadius="50dp" />
     </LinearLayout>
 
 </RelativeLayout>

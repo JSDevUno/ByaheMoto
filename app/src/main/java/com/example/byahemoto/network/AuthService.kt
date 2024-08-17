@@ -14,3 +14,4 @@ interface AuthService {
     @POST("/auth/login")
     fun login(@Body request: LoginRequest): Call<LoginResponse>
 }
+

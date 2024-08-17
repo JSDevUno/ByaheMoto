@@ -17,8 +17,7 @@ import retrofit2.Response
 class CreateAccount : AppCompatActivity() {
 
     private lateinit var emailEditText: EditText
-    private lateinit var firstNameEditText: EditText
-    private lateinit var lastNameEditText: EditText
+    private lateinit var fullnameEditText: EditText  // Changed to fullname
     private lateinit var usernameEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var confirmPasswordEditText: EditText
@@ -30,8 +29,7 @@ class CreateAccount : AppCompatActivity() {
         setContentView(R.layout.activity_create_account)
 
         emailEditText = findViewById(R.id.email)
-        firstNameEditText = findViewById(R.id.firstName)
-        lastNameEditText = findViewById(R.id.lastName)
+        fullnameEditText = findViewById(R.id.fullname)  // Changed to fullname
         usernameEditText = findViewById(R.id.username)
         passwordEditText = findViewById(R.id.passwordEditText)
         confirmPasswordEditText = findViewById(R.id.passwordEditText2)
@@ -40,18 +38,17 @@ class CreateAccount : AppCompatActivity() {
 
         createAccButton.setOnClickListener {
             val email = emailEditText.text.toString().trim()
-            val firstName = firstNameEditText.text.toString().trim()
-            val lastName = lastNameEditText.text.toString().trim()
+            val fullname = fullnameEditText.text.toString().trim()  // Changed to fullname
             val username = usernameEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
             val confirmPassword = confirmPasswordEditText.text.toString().trim()
 
-            if (email.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            if (email.isEmpty() || fullname.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
             } else if (password != confirmPassword) {
                 Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
             } else {
-                register(email, firstName, lastName, username, password, confirmPassword)
+                register(email, fullname, username, password, confirmPassword)
             }
         }
 
@@ -60,8 +57,8 @@ class CreateAccount : AppCompatActivity() {
         }
     }
 
-    private fun register(email: String, firstName: String, lastName: String, username: String, password: String, confirmPassword: String) {
-        val registerRequest = RegisterRequest(email, firstName, lastName, username, password, confirmPassword)
+    private fun register(email: String, fullname: String, username: String, password: String, confirmPassword: String) {
+        val registerRequest = RegisterRequest(fullname, username, email, password, confirmPassword)
         Log.d("CreateAccount", "Register Payload: $registerRequest")
 
         RetrofitInstance.authService.register(registerRequest).enqueue(object : Callback<Void> {
