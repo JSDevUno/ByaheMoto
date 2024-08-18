@@ -1,5 +1,10 @@
 package com.example.byahemoto.models
 
+data class ErrorResponse(
+    val success: Boolean,
+    val message: String
+)
+
 data class LoginResponse(
     val access_token: String,
     val refresh_token: String,

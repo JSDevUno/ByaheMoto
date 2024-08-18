@@ -150,6 +150,18 @@
             android:textSize="18sp"
             app:cornerRadius="50dp" />
 
+        <Button
+            android:id="@+id/createPriorityAcc"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#FFA500"
+            android:fontFamily="@font/montserrat_alternates_semibold"
+            android:text="Create Priority Account"
+            android:textSize="18sp"
+            app:cornerRadius="50dp" />
+
+
     </LinearLayout>
 
 </RelativeLayout>

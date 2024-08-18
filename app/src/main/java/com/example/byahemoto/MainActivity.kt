@@ -10,9 +10,14 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.byahemoto.models.ErrorResponse
 import com.example.byahemoto.models.LoginRequest
 import com.example.byahemoto.models.LoginResponse
 import com.example.byahemoto.network.RetrofitInstance
+import com.google.gson.Gson
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -37,7 +42,9 @@ class MainActivity : AppCompatActivity() {
         forgotPasswordTextView = findViewById(R.id.forgot_password)
         rememberMeCheckBox = findViewById(R.id.remember_me_checkbox)
 
-        loadSavedCredentials()
+        if (loadSavedCredentials()) {
+            navigateToDashboard()
+        }
 
         loginButton.setOnClickListener {
             val username = usernameEditText.text.toString().trim()
@@ -61,31 +68,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun login(username: String, password: String) {
-        val loginRequest = LoginRequest(username, password)
-        Log.d("MainActivity", "Login Payload: $loginRequest")
+        val logger = HttpLoggingInterceptor()
+        logger.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-        RetrofitInstance.authService.login(loginRequest).enqueue(object : Callback<LoginResponse> {
-            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-                if (response.isSuccessful && response.body() != null) {
-                    if (rememberMeCheckBox.isChecked) {
-                        saveCredentials(username, password)
+        RetrofitInstance.authService.login(username.toRequestBody(), password.toRequestBody())
+            .enqueue(object : Callback<LoginResponse> {
+                override fun onResponse(
+                    call: Call<LoginResponse>,
+                    response: Response<LoginResponse>
+                ) {
+                    if (response.isSuccessful && response.body() != null) {
+                        if (rememberMeCheckBox.isChecked) {
+                            saveCredentials(username, password)
+                        } else {
+                            clearSavedCredentials()
+                        }
+
+                        navigateToDashboard()
                     } else {
-                        clearSavedCredentials()
+                        handleLoginError(response.errorBody())
                     }
-
-                    val intent = Intent(this@MainActivity, UserDashboard::class.java)
-                    startActivity(intent)
-                    finish()
-                } else {
-                    Toast.makeText(this@MainActivity, "Login failed: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
-            }
 
-            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                Log.e("MainActivity", "Error logging in", t)
-                Toast.makeText(this@MainActivity, "Login failed: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+                override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                    Log.e("MainActivity", "Error logging in", t)
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Login failed: ${t.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
     }
 
     private fun saveCredentials(username: String, password: String) {
@@ -97,15 +110,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadSavedCredentials() {
+    private fun loadSavedCredentials(): Boolean {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val savedUsername = sharedPref.getString("username", null)
         val savedPassword = sharedPref.getString("password", null)
 
-        if (!savedUsername.isNullOrEmpty() && !savedPassword.isNullOrEmpty()) {
+        return if (!savedUsername.isNullOrEmpty() && !savedPassword.isNullOrEmpty()) {
             usernameEditText.setText(savedUsername)
             passwordEditText.setText(savedPassword)
             rememberMeCheckBox.isChecked = true
+            true
+        } else {
+            false
         }
     }
 
@@ -115,6 +131,27 @@ class MainActivity : AppCompatActivity() {
             remove("username")
             remove("password")
             apply()
+        }
+    }
+
+    private fun navigateToDashboard() {
+        val intent = Intent(this, UserDashboard::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun handleLoginError(errorBody: ResponseBody?) {
+        errorBody?.let {
+            try {
+                val json = Gson().fromJson(it.string(), ErrorResponse::class.java)
+                json?.let {
+                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this, "Login Failed.", Toast.LENGTH_SHORT).show()
+            }
+        } ?: run {
+            Toast.makeText(this, "Login Failed.", Toast.LENGTH_SHORT).show()
         }
     }
 }
