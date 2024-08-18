@@ -5,11 +5,14 @@ import com.example.byahemoto.models.RegisterRequest
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 
 interface AuthService {
+
     @POST("/auth/register")
     fun register(@Body request: RegisterRequest): Call<Void>
 
@@ -19,4 +22,16 @@ interface AuthService {
         @Part("username") username: RequestBody,
         @Part("password") password: RequestBody
     ): Call<LoginResponse>
+
+    @POST("/auth/forgot-password")
+    fun sendResetLink(
+        @Body email: Map<String, String>
+    ): Call<Void>
+
+    @FormUrlEncoded
+    @POST("/auth/reset-password")
+    fun resetPassword(
+        @Field("token") token: String?,
+        @Field("new_password") newPassword: String
+    ): Call<Void>
 }
