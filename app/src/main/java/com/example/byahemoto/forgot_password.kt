@@ -45,12 +45,16 @@ class forgot_password : AppCompatActivity() {
                         Log.e("ForgotPassword", "Failed to send reset link: $errorResponse")
                         Toast.makeText(this@forgot_password, "Failed to send reset link: $errorResponse", Toast.LENGTH_SHORT).show()
                     }
+
+                    Log.e("ForgotPassword", "Response headers: ${response.headers()}")
+                    Log.e("ForgotPassword", "Response message: ${response.message()}")
                 }
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 Log.e("ForgotPassword", "Error sending reset link", t)
                 Toast.makeText(this@forgot_password, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                t.printStackTrace()
             }
         })
     }
