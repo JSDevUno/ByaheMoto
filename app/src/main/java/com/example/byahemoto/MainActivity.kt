@@ -10,9 +10,15 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.byahemoto.models.ErrorResponse
 import com.example.byahemoto.models.LoginRequest
 import com.example.byahemoto.models.LoginResponse
 import com.example.byahemoto.network.RetrofitInstance
+import com.google.gson.Gson
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -44,7 +50,8 @@ class MainActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString().trim()
 
             if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please enter username and password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter username and password", Toast.LENGTH_SHORT)
+                    .show()
             } else {
                 login(username, password)
             }
@@ -61,31 +68,67 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun login(username: String, password: String) {
-        val loginRequest = LoginRequest(username, password)
-        Log.d("MainActivity", "Login Payload: $loginRequest")
+        val logger = HttpLoggingInterceptor()
+        logger.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-        RetrofitInstance.authService.login(loginRequest).enqueue(object : Callback<LoginResponse> {
-            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-                if (response.isSuccessful && response.body() != null) {
-                    if (rememberMeCheckBox.isChecked) {
-                        saveCredentials(username, password)
+        RetrofitInstance.authService.login(username.toRequestBody(), password.toRequestBody())
+            .enqueue(object : Callback<LoginResponse> {
+                override fun onResponse(
+                    call: Call<LoginResponse>,
+                    response: Response<LoginResponse>
+                ) {
+                    if (response.isSuccessful && response.body() != null) {
+                        if (rememberMeCheckBox.isChecked) {
+                            saveCredentials(username, password)
+                        } else {
+                            clearSavedCredentials()
+                        }
+
+                        val intent = Intent(this@MainActivity, UserDashboard::class.java)
+                        startActivity(intent)
+                        finish()
                     } else {
-                        clearSavedCredentials()
+                        val err = response.errorBody()
+
+                        err?.let { it ->
+                            try {
+                                val json = Gson().fromJson(it.string(), ErrorResponse::class.java)
+                                json?.let {
+                                    // Show a Toast with the error message
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        it.message,
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Login Failed.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+
+                        if (err == null) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Login Failed.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
-
-                    val intent = Intent(this@MainActivity, UserDashboard::class.java)
-                    startActivity(intent)
-                    finish()
-                } else {
-                    Toast.makeText(this@MainActivity, "Login failed: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
-            }
 
-            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                Log.e("MainActivity", "Error logging in", t)
-                Toast.makeText(this@MainActivity, "Login failed: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+                override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                    Log.e("MainActivity", "Error logging in", t)
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Login failed: ${t.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
     }
 
     private fun saveCredentials(username: String, password: String) {

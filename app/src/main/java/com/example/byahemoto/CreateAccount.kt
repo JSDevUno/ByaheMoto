@@ -70,7 +70,7 @@ class CreateAccount : AppCompatActivity() {
             return false
         }
 
-        if (password.isEmpty() || !Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$", password)) {
+        if (password.isEmpty() || !Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&*!()_+\\-=\\[\\]{}|;:,.<>?/]).{8,}\$", password)) {
             Toast.makeText(this, "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number", Toast.LENGTH_LONG).show()
             return false
         }
@@ -85,8 +85,6 @@ class CreateAccount : AppCompatActivity() {
 
     private fun register(email: String, fullName: String, username: String, password: String, confirmPassword: String) {
         val registerRequest = RegisterRequest(fullName, username, email, password, confirmPassword)
-        Log.d("CreateAccount", "Register Payload: $registerRequest")
-
         RetrofitInstance.authService.register(registerRequest).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
