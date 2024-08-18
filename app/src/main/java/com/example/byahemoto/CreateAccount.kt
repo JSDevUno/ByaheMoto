@@ -83,8 +83,8 @@ class CreateAccount : AppCompatActivity() {
         return true
     }
 
-    private fun register(email: String, fullname: String, username: String, password: String, confirmPassword: String) {
-        val registerRequest = RegisterRequest(fullname, username, email, password, confirmPassword)
+    private fun register(email: String, fullName: String, username: String, password: String, confirmPassword: String) {
+        val registerRequest = RegisterRequest(fullName, username, email, password, confirmPassword)
         Log.d("CreateAccount", "Register Payload: $registerRequest")
 
         RetrofitInstance.authService.register(registerRequest).enqueue(object : Callback<Void> {
@@ -95,6 +95,8 @@ class CreateAccount : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 } else {
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("CreateAccount", "Registration failed: ${response.message()}, Error: $errorBody")
                     Toast.makeText(this@CreateAccount, "Registration failed: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -105,4 +107,5 @@ class CreateAccount : AppCompatActivity() {
             }
         })
     }
+
 }
