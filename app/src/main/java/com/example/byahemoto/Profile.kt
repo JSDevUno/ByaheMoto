@@ -37,7 +37,6 @@ class Profile : AppCompatActivity() {
             }
         }
 
-        // Find the logout layout and set a click listener
         logoutLayout = findViewById(R.id.linearlayout)
         logoutLayout.setOnClickListener {
             logout()
