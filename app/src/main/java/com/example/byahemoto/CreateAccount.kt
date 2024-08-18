@@ -23,7 +23,6 @@ class CreateAccount : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var confirmPasswordEditText: EditText
     private lateinit var createAccButton: Button
-    private lateinit var createPriorityAccButton: Button
     private lateinit var backBtn: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +35,6 @@ class CreateAccount : AppCompatActivity() {
         passwordEditText = findViewById(R.id.passwordEditText)
         confirmPasswordEditText = findViewById(R.id.passwordEditText2)
         createAccButton = findViewById(R.id.createAcc)
-        createPriorityAccButton = findViewById(R.id.createPriorityAcc)
         backBtn = findViewById(R.id.backBtn)
 
         createAccButton.setOnClickListener {
@@ -49,10 +47,6 @@ class CreateAccount : AppCompatActivity() {
             if (validateInputs(email, fullname, username, password, confirmPassword)) {
                 register(email, fullname, username, password, confirmPassword)
             }
-        }
-        createPriorityAccButton.setOnClickListener {
-            val intent = Intent(this, Signup::class.java)
-            startActivity(intent)
         }
 
         backBtn.setOnClickListener {
@@ -77,7 +71,7 @@ class CreateAccount : AppCompatActivity() {
         }
 
         if (password.isEmpty() || !Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&*!()_+\\-=\\[\\]{}|;:,.<>?/]).{8,}\$", password)) {
-            Toast.makeText(this, "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one symbol", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number", Toast.LENGTH_LONG).show()
             return false
         }
 
@@ -99,13 +93,9 @@ class CreateAccount : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 } else {
-                    if (response.code() == 400) {
-                        Toast.makeText(this@CreateAccount, "Email already exists. Please use a different email.", Toast.LENGTH_LONG).show()
-                    } else {
-                        val errorBody = response.errorBody()?.string()
-                        Log.e("CreateAccount", "Registration failed: ${response.message()}, Error: $errorBody")
-                        Toast.makeText(this@CreateAccount, "Registration failed: ${response.message()}", Toast.LENGTH_SHORT).show()
-                    }
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("CreateAccount", "Registration failed: ${response.message()}, Error: $errorBody")
+                    Toast.makeText(this@CreateAccount, "Registration failed: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -115,6 +105,5 @@ class CreateAccount : AppCompatActivity() {
             }
         })
     }
-
 
 }
