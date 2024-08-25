@@ -30,6 +30,7 @@ class Signup : AppCompatActivity() {
             onBackPressed()
         }
 
+
         selectButton = findViewById(R.id.selectButton)
         idVerification = findViewById(R.id.idVerification)
         fullNameEditText = findViewById(R.id.fullName1)
