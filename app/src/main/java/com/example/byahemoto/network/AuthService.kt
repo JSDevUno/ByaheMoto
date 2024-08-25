@@ -2,6 +2,7 @@ package com.example.byahemoto.network
 
 import com.example.byahemoto.models.LoginResponse
 import com.example.byahemoto.models.RegisterRequest
+import com.example.byahemoto.models.SignupRequest
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
@@ -15,6 +16,8 @@ interface AuthService {
 
     @POST("/auth/register")
     fun register(@Body request: RegisterRequest): Call<Void>
+    @POST("/auth/signup-request")  // tentative
+    fun sendSignupRequest(@Body request: SignupRequest): Call<Void>
 
     @Multipart
     @POST("/auth/login")

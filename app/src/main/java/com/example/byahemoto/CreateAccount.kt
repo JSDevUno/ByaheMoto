@@ -23,6 +23,7 @@ class CreateAccount : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var confirmPasswordEditText: EditText
     private lateinit var createAccButton: Button
+    private lateinit var createPriorityAccButton: Button
     private lateinit var backBtn: ImageView
 
 
@@ -36,6 +37,7 @@ class CreateAccount : AppCompatActivity() {
         passwordEditText = findViewById(R.id.passwordEditText)
         confirmPasswordEditText = findViewById(R.id.passwordEditText2)
         createAccButton = findViewById(R.id.createAcc)
+        createPriorityAccButton = findViewById(R.id.createPriorityAcc)
         backBtn = findViewById(R.id.backBtn)
 
         createAccButton.setOnClickListener {
@@ -50,6 +52,9 @@ class CreateAccount : AppCompatActivity() {
             }
         }
 
+        createPriorityAccButton.setOnClickListener {
+            navigateToSignup()
+        }
         backBtn.setOnClickListener {
             onBackPressed()
         }
@@ -105,6 +110,10 @@ class CreateAccount : AppCompatActivity() {
                 Toast.makeText(this@CreateAccount, "Registration failed: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+    private fun navigateToSignup() {
+        val intent = Intent(this, Signup::class.java)
+        startActivity(intent)
     }
 
 }
