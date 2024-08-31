@@ -2,7 +2,9 @@ package com.example.byahemoto.network
 
 import com.example.byahemoto.models.LoginResponse
 import com.example.byahemoto.models.RegisterRequest
+import com.example.byahemoto.models.ResetPasswordRequest
 import com.example.byahemoto.models.SignupRequest
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
@@ -16,8 +18,13 @@ interface AuthService {
 
     @POST("/auth/register")
     fun register(@Body request: RegisterRequest): Call<Void>
-    @POST("/auth/signup-request")  // tentative
-    fun sendSignupRequest(@Body request: SignupRequest): Call<Void>
+    @Multipart
+    @POST("/auth/verification")
+    fun sendVerificationRequest(
+        @Part file: MultipartBody.Part,
+        @Part("userId") userId: RequestBody,
+        @Part("identityType") identityType: RequestBody
+    ): Call<Void>
 
     @Multipart
     @POST("/auth/login")
@@ -31,10 +38,8 @@ interface AuthService {
         @Body email: Map<String, String>
     ): Call<Void>
 
-    @FormUrlEncoded
     @POST("/auth/reset-password")
     fun resetPassword(
-        @Field("token") token: String?,
-        @Field("new_password") newPassword: String
+        @Body resetPasswordRequest: ResetPasswordRequest
     ): Call<Void>
 }

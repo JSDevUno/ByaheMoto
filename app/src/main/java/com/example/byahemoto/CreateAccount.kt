@@ -26,7 +26,6 @@ class CreateAccount : AppCompatActivity() {
     private lateinit var createPriorityAccButton: Button
     private lateinit var backBtn: ImageView
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_account)
@@ -55,6 +54,7 @@ class CreateAccount : AppCompatActivity() {
         createPriorityAccButton.setOnClickListener {
             navigateToSignup()
         }
+
         backBtn.setOnClickListener {
             onBackPressed()
         }
@@ -77,11 +77,11 @@ class CreateAccount : AppCompatActivity() {
         }
 
         if (password.isEmpty() || !Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&*!()_+\\-=\\[\\]{}|;:,.<>?/]).{8,}\$", password)) {
-            Toast.makeText(this, "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Password must be at least 8 characters long with a mix of upper/lowercase letters, numbers, and symbols", Toast.LENGTH_SHORT).show()
             return false
         }
 
-        if (confirmPassword.isEmpty() || password != confirmPassword) {
+        if (password != confirmPassword) {
             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -111,9 +111,9 @@ class CreateAccount : AppCompatActivity() {
             }
         })
     }
+
     private fun navigateToSignup() {
         val intent = Intent(this, Signup::class.java)
         startActivity(intent)
     }
-
 }
