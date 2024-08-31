@@ -21,7 +21,7 @@ interface AuthService {
     fun register(@Body request: RegisterRequest): Call<SignupResponse>
 
     @Multipart
-    @POST("/auth/verificatio")
+    @POST("/auth/verification")
     fun sendVerificationRequest(
         @Part file: MultipartBody.Part,
         @Part("userId") userId: RequestBody,
