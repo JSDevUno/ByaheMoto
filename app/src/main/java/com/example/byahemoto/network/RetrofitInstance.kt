@@ -27,4 +27,3 @@ object RetrofitInstance {
         retrofit.create(AuthService::class.java)
     }
 }
-

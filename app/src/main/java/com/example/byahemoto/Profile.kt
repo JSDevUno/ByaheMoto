@@ -51,6 +51,9 @@ class Profile : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
+        val profileImageView = findViewById<ImageView>(R.id.imageView2)
+        profileImageView.setImageResource(R.drawable.avatar)
+
         val backBtn = findViewById<ImageView>(R.id.backBtn)
         backBtn.setOnClickListener {
             onBackPressed()
