@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.byahemoto.models.RegisterRequest
+import com.example.byahemoto.models.SignupResponse
 import com.example.byahemoto.network.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
@@ -60,7 +61,13 @@ class CreateAccount : AppCompatActivity() {
         }
     }
 
-    private fun validateInputs(email: String, fullname: String, username: String, password: String, confirmPassword: String): Boolean {
+    private fun validateInputs(
+        email: String,
+        fullname: String,
+        username: String,
+        password: String,
+        confirmPassword: String
+    ): Boolean {
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show()
             return false
@@ -72,12 +79,24 @@ class CreateAccount : AppCompatActivity() {
         }
 
         if (username.isEmpty() || !Pattern.matches("^[a-zA-Z0-9_]+$", username)) {
-            Toast.makeText(this, "Username must be alphanumeric with no spaces or special characters", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                "Username must be alphanumeric with no spaces or special characters",
+                Toast.LENGTH_SHORT
+            ).show()
             return false
         }
 
-        if (password.isEmpty() || !Pattern.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&*!()_+\\-=\\[\\]{}|;:,.<>?/]).{8,}\$", password)) {
-            Toast.makeText(this, "Password must be at least 8 characters long with a mix of upper/lowercase letters, numbers, and symbols", Toast.LENGTH_SHORT).show()
+        if (password.isEmpty() || !Pattern.matches(
+                "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&*!()_+\\-=\\[\\]{}|;:,.<>?/]).{8,}\$",
+                password
+            )
+        ) {
+            Toast.makeText(
+                this,
+                "Password must be at least 8 characters long with a mix of upper/lowercase letters, numbers, and symbols",
+                Toast.LENGTH_SHORT
+            ).show()
             return false
         }
 
@@ -89,27 +108,52 @@ class CreateAccount : AppCompatActivity() {
         return true
     }
 
-    private fun register(email: String, fullName: String, username: String, password: String, confirmPassword: String) {
+    private fun register(
+        email: String,
+        fullName: String,
+        username: String,
+        password: String,
+        confirmPassword: String
+    ) {
         val registerRequest = RegisterRequest(fullName, username, email, password, confirmPassword)
-        RetrofitInstance.authService.register(registerRequest).enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(this@CreateAccount, "Registration successful", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this@CreateAccount, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                } else {
-                    val errorBody = response.errorBody()?.string()
-                    Log.e("CreateAccount", "Registration failed: ${response.message()}, Error: $errorBody")
-                    Toast.makeText(this@CreateAccount, "Registration failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+        RetrofitInstance.authService.register(registerRequest)
+            .enqueue(object : Callback<SignupResponse> {
+                override fun onResponse(
+                    call: Call<SignupResponse>,
+                    response: Response<SignupResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(
+                            this@CreateAccount,
+                            "Registration successful",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        val intent = Intent(this@CreateAccount, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        val errorBody = response.errorBody()?.string()
+                        Log.e(
+                            "CreateAccount",
+                            "Registration failed: ${response.message()}, Error: $errorBody"
+                        )
+                        Toast.makeText(
+                            this@CreateAccount,
+                            "Registration failed: ${response.message()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.e("CreateAccount", "Error during registration", t)
-                Toast.makeText(this@CreateAccount, "Registration failed: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+                override fun onFailure(call: Call<SignupResponse>, t: Throwable) {
+                    Log.e("CreateAccount", "Error during registration", t)
+                    Toast.makeText(
+                        this@CreateAccount,
+                        "Registration failed: ${t.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
     }
 
     private fun navigateToSignup() {
