@@ -4,18 +4,24 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.byahemoto.models.RegisterRequest
+import com.example.byahemoto.models.SignupResponse
 import com.example.byahemoto.network.RetrofitInstance
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.io.FileOutputStream
 
 class Signup : AppCompatActivity() {
     private lateinit var selectButton: Button
@@ -46,7 +52,8 @@ class Signup : AppCompatActivity() {
         confirmPasswordEditText = findViewById(R.id.passwordEditText2)
         userTypeSpinner = findViewById(R.id.userTypeSpinner)
 
-        val userTypeOptions = arrayOf("Student", "Senior", "PWD")
+        val userTypeOptions =
+            arrayOf("Student", "Senior", "PWD") // Remove this and the options in the XML file
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, userTypeOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         userTypeSpinner.adapter = adapter
@@ -71,59 +78,129 @@ class Signup : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val registerRequest = RegisterRequest(fullName, username, email, password, confirmPassword, registration_type = userType)
+            val registerRequest = RegisterRequest(
+                fullName,
+                username,
+                email,
+                password,
+                confirmPassword,
+                registration_type = "priority"
+            )
             Log.d("Signup", "RegisterRequest: $registerRequest")
 
-            val userId = RequestBody.create(MultipartBody.FORM, "1")
             val filePart = idVerificationUri?.let { uri ->
-                val file = File(uri.path!!)
-                Log.d("Signup", "File Path: ${file.absolutePath}")
-                val requestFile = RequestBody.create("application/octet-stream".toMediaTypeOrNull(), file)
-                MultipartBody.Part.createFormData("file", file.name, requestFile)
+                val file = getFileFromUri(uri)
+                if (file != null) {
+                    Log.d("Signup", "File Path: ${file.absolutePath}")
+                    file.asRequestBody("image/*".toMediaTypeOrNull()).let {
+                        MultipartBody.Part.createFormData("file", file.name, it)
+                    }
+                } else {
+                    Log.e("Signup", "File not found at the given URI")
+                    null
+                }
             }
 
             if (filePart == null) {
-                Toast.makeText(this, "ID verification file not selected. Please try again.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "ID verification file not selected. Please try again.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
             Log.d("Signup", "File Part: $filePart")
 
-            RetrofitInstance.authService.register(registerRequest).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    Log.d("Signup", "Register Response: ${response.code()} ${response.message()}")
-                    if (response.isSuccessful) {
-                        val identityType = RequestBody.create(MultipartBody.FORM, userType)
+            RetrofitInstance.authService.register(registerRequest)
+                .enqueue(object : Callback<SignupResponse> {
+                    override fun onResponse(
+                        call: Call<SignupResponse>,
+                        response: Response<SignupResponse>
+                    ) {
+                        Log.d(
+                            "Signup",
+                            "Register Response: ${response.code()} ${response.message()}"
+                        )
 
-                        RetrofitInstance.authService.sendVerificationRequest(filePart, userId, identityType).enqueue(object : Callback<Void> {
-                            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                                Log.d("Signup", "Verification Response: ${response.code()} ${response.message()}")
+                        if (!response.isSuccessful) {
+                            Toast.makeText(
+                                this@Signup,
+                                "Failed to send signup request. Please try again.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return
+                        }
+
+                        val signupResponse = response.body()
+                        val userId = signupResponse?.data?.id.toString()
+
+                        Log.d("Signup", "User ID: $userId")
+
+                        if (userId.isEmpty()) {
+                            Toast.makeText(
+                                this@Signup,
+                                "User ID not found in the response.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return
+                        }
+
+                        val identityType = userType.uppercase().toRequestBody(MultipartBody.FORM)
+
+                        RetrofitInstance.authService.sendVerificationRequest(
+                            filePart,
+                            userId.toRequestBody(MultipartBody.FORM),
+                            identityType
+                        ).enqueue(object : Callback<Void> {
+                            override fun onResponse(
+                                call: Call<Void>,
+                                response: Response<Void>
+                            ) {
+                                Log.d(
+                                    "Signup",
+                                    "Verification Response: ${response.code()} ${response.message()}"
+                                )
                                 if (response.isSuccessful) {
-                                    Toast.makeText(this@Signup, "Signup request and verification sent successfully! Await admin approval.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        this@Signup,
+                                        "Signup request and verification sent successfully! Await admin approval.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     finish()
                                 } else {
-                                    Toast.makeText(this@Signup, "Failed to send verification request. Please try again.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        this@Signup,
+                                        "Failed to send verification request. Please try again.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
 
                             override fun onFailure(call: Call<Void>, t: Throwable) {
                                 Log.e("Signup", "Verification Request Failed: ${t.message}", t)
-                                Toast.makeText(this@Signup, "An error occurred: ${t.message}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    this@Signup,
+                                    "An error occurred: ${t.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         })
-                    } else {
-                        Toast.makeText(this@Signup, "Failed to send signup request. Please try again.", Toast.LENGTH_SHORT).show()
                     }
-                }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    Log.e("Signup", "Signup Request Failed: ${t.message}", t)
-                    Toast.makeText(this@Signup, "An error occurred: ${t.message}", Toast.LENGTH_SHORT).show()
-                }
-            })
+                    override fun onFailure(call: Call<SignupResponse>, t: Throwable) {
+                        Log.e("Signup", "Signup Request Failed: ${t.message}", t)
+                        Toast.makeText(
+                            this@Signup,
+                            "An error occurred: ${t.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                })
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1 && resultCode == Activity.RESULT_OK && data != null) {
@@ -131,4 +208,26 @@ class Signup : AppCompatActivity() {
             idVerification.text = idVerificationUri?.toString()
         }
     }
+
+    private fun getFileFromUri(uri: Uri): File? {
+        val returnCursor = contentResolver.query(uri, null, null, null, null)
+        val nameIndex = returnCursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        returnCursor?.moveToFirst()
+        val name = nameIndex?.let { returnCursor.getString(it) }
+        returnCursor?.close()
+
+        val file = File(cacheDir, name ?: "temp_file")
+        try {
+            val inputStream = contentResolver.openInputStream(uri)
+            val outputStream = FileOutputStream(file)
+            inputStream?.copyTo(outputStream)
+            inputStream?.close()
+            outputStream.close()
+        } catch (e: Exception) {
+            Log.e("Signup", "Failed to copy file from URI: ${e.message}", e)
+            return null
+        }
+        return file
+    }
+
 }
