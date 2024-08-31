@@ -78,13 +78,17 @@ class MainActivity : AppCompatActivity() {
                     response: Response<LoginResponse>
                 ) {
                     if (response.isSuccessful && response.body() != null) {
-                        if (rememberMeCheckBox.isChecked) {
-                            saveCredentials(username, password)
-                        } else {
-                            clearSavedCredentials()
-                        }
+                        val loginResponse = response.body()
+                        if (loginResponse != null) {
+                            if (rememberMeCheckBox.isChecked) {
+                                saveCredentials(username, password)
+                            } else {
+                                clearSavedCredentials()
+                            }
+                            saveUserDetails(loginResponse)
 
-                        navigateToDashboard()
+                            navigateToDashboard()
+                        }
                     } else {
                         handleLoginError(response.errorBody())
                     }
@@ -99,6 +103,17 @@ class MainActivity : AppCompatActivity() {
                     ).show()
                 }
             })
+    }
+
+
+    private fun saveUserDetails(loginResponse: LoginResponse) {
+        val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("access_token", loginResponse.access_token)
+            putString("username", loginResponse.user.username)
+            putString("email", loginResponse.user.email)
+            apply()
+        }
     }
 
     private fun saveCredentials(username: String, password: String) {
@@ -130,6 +145,8 @@ class MainActivity : AppCompatActivity() {
         with(sharedPref.edit()) {
             remove("username")
             remove("password")
+            remove("access_token")
+            remove("email")
             apply()
         }
     }
