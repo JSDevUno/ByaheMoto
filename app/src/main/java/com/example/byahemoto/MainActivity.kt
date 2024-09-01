@@ -11,7 +11,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.byahemoto.models.ErrorResponse
-import com.example.byahemoto.models.LoginRequest
 import com.example.byahemoto.models.LoginResponse
 import com.example.byahemoto.network.RetrofitInstance
 import com.google.gson.Gson
@@ -51,7 +50,8 @@ class MainActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString().trim()
 
             if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please enter username and password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter username and password", Toast.LENGTH_SHORT)
+                    .show()
             } else {
                 login(username, password)
             }
@@ -111,8 +111,7 @@ class MainActivity : AppCompatActivity() {
             putString("access_token", loginResponse.access_token)
             putString("username", loginResponse.user.username)
             putString("email", loginResponse.user.email)
-            putString("phone_number", loginResponse.user.phoneNumber)  // Save phone number
-            putString("profile_pic_url", loginResponse.user.profilePicUrl)
+            putString("phone_number", loginResponse.user.phone_number)  // Save phone number
             apply()
         }
         saveTokenToPreferences(loginResponse.access_token) // Save token separately
