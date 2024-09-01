@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
                             } else {
                                 clearSavedCredentials()
                             }
-                            saveUserDetails(loginResponse)
+                            saveUserDetails(loginResponse) // Save all user details and token
 
                             navigateToDashboard()
                         }
@@ -105,15 +105,17 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
-
     private fun saveUserDetails(loginResponse: LoginResponse) {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putString("access_token", loginResponse.access_token)
             putString("username", loginResponse.user.username)
             putString("email", loginResponse.user.email)
+            putString("phone_number", loginResponse.user.phoneNumber)  // Save phone number
+            putString("profile_pic_url", loginResponse.user.profilePicUrl)
             apply()
         }
+        saveTokenToPreferences(loginResponse.access_token) // Save token separately
     }
 
     private fun saveCredentials(username: String, password: String) {
@@ -147,6 +149,8 @@ class MainActivity : AppCompatActivity() {
             remove("password")
             remove("access_token")
             remove("email")
+            remove("phone_number")
+            remove("profile_pic_url")
             apply()
         }
     }
@@ -169,6 +173,14 @@ class MainActivity : AppCompatActivity() {
             }
         } ?: run {
             Toast.makeText(this, "Login Failed.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun saveTokenToPreferences(token: String) {
+        val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("auth_token", token)
+            apply()
         }
     }
 }

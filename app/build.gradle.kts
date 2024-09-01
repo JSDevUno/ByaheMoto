@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
 }
 
 android {
@@ -65,5 +66,10 @@ dependencies {
     // For secure network communication
     implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+
+    // Image loading (Glide)
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    kapt("com.github.bumptech.glide:compiler:4.15.1") // Use kapt instead of annotationProcessor
+
 
 }

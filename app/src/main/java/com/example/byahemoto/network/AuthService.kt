@@ -1,6 +1,8 @@
 package com.example.byahemoto.network
 
 import com.example.byahemoto.models.LoginResponse
+import com.example.byahemoto.models.ProfileUpdate
+import com.example.byahemoto.models.ProfileUpdateResponse
 import com.example.byahemoto.models.RegisterRequest
 import com.example.byahemoto.models.ResetPasswordRequest
 import com.example.byahemoto.models.SignupRequest
@@ -11,14 +13,30 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 
 interface AuthService {
 
     @POST("/auth/register")
     fun register(@Body request: RegisterRequest): Call<SignupResponse>
+
+    @Multipart
+    @PUT("/profile/picture")
+    fun updateProfilePicture(
+        @Header("Authorization") token: String,
+        @Part profilePicture: MultipartBody.Part
+    ): Call<Void>
+
+
+    @PUT("/profile/")
+    fun updateProfile(
+        @Header("Authorization") token: String,
+        @Body profileUpdate: ProfileUpdate
+    ): Call<ProfileUpdateResponse>
 
     @Multipart
     @POST("/auth/verification")

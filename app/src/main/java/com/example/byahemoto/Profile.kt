@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class Profile : AppCompatActivity() {
@@ -25,6 +26,8 @@ class Profile : AppCompatActivity() {
     private lateinit var nameTextView: TextView
     private lateinit var emailTextView: TextView
     private lateinit var regionTextView: TextView
+    private lateinit var profileImageView: ImageView
+    private lateinit var phoneNumberTextView: TextView
     private lateinit var locationManager: LocationManager
 
     private val activityMap = mapOf(
@@ -51,14 +54,21 @@ class Profile : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        val profileImageView = findViewById<ImageView>(R.id.imageView2)
+        // Initialize views
+        profileImageView = findViewById(R.id.imageView2)
+        phoneNumberTextView = findViewById(R.id.textView10)
+        nameTextView = findViewById(R.id.textView4)
+        emailTextView = findViewById(R.id.textView7)
+        regionTextView = findViewById(R.id.textView11)
+        logoutLayout = findViewById(R.id.linearlayout)
+
+        val editProfileButton = findViewById<ImageView>(R.id.imageView3)
+        val backBtn = findViewById<ImageView>(R.id.backBtn)
+
+        // Set default profile image
         profileImageView.setImageResource(R.drawable.avatar)
 
-        val backBtn = findViewById<ImageView>(R.id.backBtn)
-        backBtn.setOnClickListener {
-            onBackPressed()
-        }
-
+        // Navigation setup
         bottomNavigationView = findViewById(R.id.BottomNavigation)
         bottomNavigationView.selectedItemId = R.id.nav_profile
 
@@ -73,20 +83,21 @@ class Profile : AppCompatActivity() {
             }
         }
 
-        logoutLayout = findViewById(R.id.linearlayout)
+        // Edit Profile button
+        editProfileButton.setOnClickListener {
+            val intent = Intent(this, EditProfile::class.java)
+            startActivity(intent)
+        }
+
+        // Logout button
         logoutLayout.setOnClickListener {
             logout()
         }
 
-
-        nameTextView = findViewById(R.id.textView4)
-        emailTextView = findViewById(R.id.textView7)
-        regionTextView = findViewById(R.id.textView11)
-
-
+        // Load user data
         loadUserData()
 
-
+        // Location Manager setup
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
@@ -95,13 +106,27 @@ class Profile : AppCompatActivity() {
         } else {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 1)
         }
+
+        // Back button
+        backBtn.setOnClickListener {
+            onBackPressed()
+        }
     }
 
     private fun loadUserData() {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val username = sharedPref.getString("username", "Unknown Name")
         val email = sharedPref.getString("email", "Unknown Email")
+        val phoneNumber = sharedPref.getString("phone_number", "Unknown Phone Number")
 
+        val profilePicUrl = sharedPref.getString("profile_pic_url", null)
+        if (profilePicUrl != null) {
+            Glide.with(this).load(profilePicUrl).into(profileImageView)
+        } else {
+            profileImageView.setImageResource(R.drawable.avatar)
+        }
+
+        phoneNumberTextView.text = phoneNumber
         nameTextView.text = username
         emailTextView.text = email
     }
@@ -129,5 +154,11 @@ class Profile : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Location permissions are required to fetch the region.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh user data when returning to the Profile activity
+        loadUserData()
     }
 }
