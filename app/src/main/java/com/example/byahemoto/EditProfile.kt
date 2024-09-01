@@ -81,11 +81,11 @@ class EditProfile : AppCompatActivity() {
 
     private fun saveProfileChanges() {
         val token = getTokenFromPreferences()
-        Log.d("AuthToken", "Token: $token") // Log the token to ensure it's correctly retrieved
+        Log.d("AuthToken", "Token: $token")
 
         val phoneNumber = phoneNumberEditText.text.toString().trim()
 
-        // Save phone number locally
+
         val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
         with(sharedPref.edit()) {
             putString("phone_number", phoneNumber)
@@ -197,7 +197,7 @@ class EditProfile : AppCompatActivity() {
         val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
         val token = sharedPref.getString("auth_token", "") ?: ""
         Log.d("AuthToken", "Retrieved token: $token")
-        return "Bearer $token" // If your API requires "Bearer " prefix
+        return "Bearer $token"
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

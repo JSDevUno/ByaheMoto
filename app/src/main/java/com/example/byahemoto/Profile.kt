@@ -54,7 +54,7 @@ class Profile : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        // Initialize views
+
         profileImageView = findViewById(R.id.imageView2)
         phoneNumberTextView = findViewById(R.id.textView10)
         nameTextView = findViewById(R.id.textView4)
@@ -65,10 +65,10 @@ class Profile : AppCompatActivity() {
         val editProfileButton = findViewById<ImageView>(R.id.imageView3)
         val backBtn = findViewById<ImageView>(R.id.backBtn)
 
-        // Set default profile image
+
         profileImageView.setImageResource(R.drawable.avatar)
 
-        // Navigation setup
+
         bottomNavigationView = findViewById(R.id.BottomNavigation)
         bottomNavigationView.selectedItemId = R.id.nav_profile
 
@@ -83,21 +83,21 @@ class Profile : AppCompatActivity() {
             }
         }
 
-        // Edit Profile button
+
         editProfileButton.setOnClickListener {
             val intent = Intent(this, EditProfile::class.java)
             startActivity(intent)
         }
 
-        // Logout button
+
         logoutLayout.setOnClickListener {
             logout()
         }
 
-        // Load user data
+
         loadUserData()
 
-        // Location Manager setup
+
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
@@ -158,7 +158,7 @@ class Profile : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh user data when returning to the Profile activity
+
         loadUserData()
     }
 }
