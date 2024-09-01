@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:fontFamily="@font/montserrat"
+            android:fontFamily="@font/montserrat_alternates_light"
             android:paddingTop="50dp"
             android:text="SIGN UP NOW!"
             android:textAlignment="center"
@@ -46,7 +46,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/topPanel"
         android:orientation="vertical"
-        android:padding="29dp">
+        android:paddingLeft="29dp"
+        android:paddingRight="29dp"
+        android:paddingTop="15dp">
 
         <EditText
             android:id="@+id/fullName1"
@@ -150,7 +152,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:orientation="horizontal"
             android:layout_marginTop="10dp"
             android:gravity="center_horizontal">
@@ -159,8 +161,8 @@
                 android:id="@+id/idVerification"
                 android:layout_marginRight="10dp"
                 android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="0dp"
                 android:background="@drawable/custom_panel"
                 android:backgroundTint="@color/white"
                 android:drawablePadding="8dp"
@@ -173,7 +175,7 @@
             <Button
                 android:id="@+id/selectButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:backgroundTint="#0a9dea"
                 android:text="Select ID" />
         </LinearLayout>
