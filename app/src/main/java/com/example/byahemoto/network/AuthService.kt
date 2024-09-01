@@ -3,6 +3,8 @@ package com.example.byahemoto.network
 import com.example.byahemoto.models.LoginResponse
 import com.example.byahemoto.models.ProfileUpdate
 import com.example.byahemoto.models.ProfileUpdateResponse
+import com.example.byahemoto.models.RefreshTokenRequest
+import com.example.byahemoto.models.RefreshTokenResponse
 import com.example.byahemoto.models.RegisterRequest
 import com.example.byahemoto.models.ResetPasswordRequest
 import com.example.byahemoto.models.SignupRequest
@@ -28,8 +30,11 @@ interface AuthService {
     @PUT("/profile/picture")
     fun updateProfilePicture(
         @Header("Authorization") token: String,
-        @Part profilePicture: MultipartBody.Part
+        @Part profilePicture: MultipartBody.Part // Use @Part directly
     ): Call<Void>
+
+    @POST("/auth/refresh-token")
+    fun refreshToken(@Body request: RefreshTokenRequest): Call<RefreshTokenResponse>
 
 
     @PUT("/profile/")
