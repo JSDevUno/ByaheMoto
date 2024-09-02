@@ -17,6 +17,5 @@ data class User(
     val username: String,
     val email: String,
     val full_name: String,
-    val phoneNumber: String,
-    val profilePicUrl: String?
+    val phone_number: String?
 )

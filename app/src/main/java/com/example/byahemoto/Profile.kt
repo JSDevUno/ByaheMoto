@@ -13,10 +13,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.model.GlideUrl
+import com.example.byahemoto.utils.Constants
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class Profile : AppCompatActivity() {
@@ -100,11 +101,22 @@ class Profile : AppCompatActivity() {
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER, 0, 0f, locationListener
+            )
         } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 1)
+            ActivityCompat.requestPermissions(
+                this, arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ), 1
+            )
         }
 
         // Back button
@@ -119,12 +131,15 @@ class Profile : AppCompatActivity() {
         val email = sharedPref.getString("email", "Unknown Email")
         val phoneNumber = sharedPref.getString("phone_number", "Unknown Phone Number")
 
-        val profilePicUrl = sharedPref.getString("profile_pic_url", null)
-        if (profilePicUrl != null) {
-            Glide.with(this).load(profilePicUrl).into(profileImageView)
-        } else {
-            profileImageView.setImageResource(R.drawable.avatar)
+
+        // Load profile image
+        val profilePicUrl = GlideUrl("${Constants.BASE_URL}/profile/picture") {
+            mapOf(
+                Pair("Authorization", "Bearer ${sharedPref.getString("access_token", "")}")
+            )
         }
+
+        Glide.with(this).load(profilePicUrl).placeholder(R.drawable.avatar).into(profileImageView)
 
         phoneNumberTextView.text = phoneNumber
         nameTextView.text = username
@@ -144,15 +159,25 @@ class Profile : AppCompatActivity() {
         finish()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
+            if (ActivityCompat.checkSelfPermission(
+                    this, Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
+                    this, Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, 0, 0f, locationListener
+                )
             }
         } else {
-            Toast.makeText(this, "Location permissions are required to fetch the region.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this, "Location permissions are required to fetch the region.", Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
