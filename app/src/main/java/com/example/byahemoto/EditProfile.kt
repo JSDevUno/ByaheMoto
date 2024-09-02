@@ -207,7 +207,6 @@ class EditProfile : AppCompatActivity() {
                             finish()
                             return
                         }
-
                         saveProfileChanges()
                     } else {
                         val errorBody = response.errorBody()?.string() ?: "Unknown error"
