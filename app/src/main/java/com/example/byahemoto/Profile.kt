@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.model.GlideUrl
 import com.example.byahemoto.utils.Constants
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -30,6 +31,7 @@ class Profile : AppCompatActivity() {
     private lateinit var profileImageView: ImageView
     private lateinit var phoneNumberTextView: TextView
     private lateinit var locationManager: LocationManager
+    private val REQUEST_CODE_EDIT_PROFILE = 1001
 
     private val activityMap = mapOf(
         R.id.nav_home to UserDashboard::class.java,
@@ -87,7 +89,7 @@ class Profile : AppCompatActivity() {
 
         editProfileButton.setOnClickListener {
             val intent = Intent(this, EditProfile::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, REQUEST_CODE_EDIT_PROFILE)
         }
 
 
@@ -129,7 +131,7 @@ class Profile : AppCompatActivity() {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val username = sharedPref.getString("username", "Unknown Name")
         val email = sharedPref.getString("email", "Unknown Email")
-        val phoneNumber = sharedPref.getString("phone_number", "Unknown Phone Number")
+        val phoneNumber = sharedPref.getString("phone_number", "")
 
 
         // Load profile image
@@ -139,7 +141,13 @@ class Profile : AppCompatActivity() {
             )
         }
 
-        Glide.with(this).load(profilePicUrl).placeholder(R.drawable.avatar).into(profileImageView)
+        Glide.with(this)
+            .load(profilePicUrl)
+            .placeholder(R.drawable.avatar)
+            .error(R.drawable.avatar)
+            .skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .into(profileImageView)
 
         phoneNumberTextView.text = phoneNumber
         nameTextView.text = username
@@ -185,5 +193,14 @@ class Profile : AppCompatActivity() {
         super.onResume()
 
         loadUserData()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_EDIT_PROFILE && resultCode == RESULT_OK) {
+            loadUserData()
+        }
     }
 }
