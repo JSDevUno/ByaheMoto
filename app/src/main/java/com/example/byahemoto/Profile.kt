@@ -69,7 +69,6 @@ class Profile : AppCompatActivity() {
 
         profileImageView.setImageResource(R.drawable.avatar)
 
-
         bottomNavigationView = findViewById(R.id.BottomNavigation)
         bottomNavigationView.selectedItemId = R.id.nav_profile
 
