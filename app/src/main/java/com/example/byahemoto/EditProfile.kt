@@ -17,9 +17,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.model.GlideUrl
 import com.example.byahemoto.models.ProfileUpdate
 import com.example.byahemoto.models.ProfileUpdateResponse
 import com.example.byahemoto.network.RetrofitInstance
+import com.example.byahemoto.utils.Constants
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -146,14 +149,22 @@ class EditProfile : AppCompatActivity() {
         val phoneNumber = sharedPref.getString("phone_number", "")
         phoneNumberEditText.setText(phoneNumber)
 
-        val profilePicUrl = sharedPref.getString("profile_pic_url", null)
-        if (profilePicUrl != null) {
-            Glide.with(this).load(profilePicUrl).into(profileImageView)
-        } else {
-            profileImageView.setImageResource(R.drawable.avatar)
+        val profilePicUrl = GlideUrl("${Constants.BASE_URL}/profile/picture") {
+            mapOf(
+                Pair("Authorization", "Bearer ${sharedPref.getString("auth_token", "")}")
+            )
         }
+
+        Glide.with(this)
+            .load(profilePicUrl)
+            .placeholder(R.drawable.avatar)
+            .error(R.drawable.avatar)
+            .skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .into(profileImageView)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
@@ -188,14 +199,7 @@ class EditProfile : AppCompatActivity() {
             .enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
-                        val newProfilePicUrl =
-                            file.absolutePath
-                        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
                         selectedImageFile = null
-                        with(sharedPref.edit()) {
-                            putString("profile_pic_url", newProfilePicUrl)
-                            apply()
-                        }
 
                         val phoneNumber = phoneNumberEditText.text.toString().trim()
 
