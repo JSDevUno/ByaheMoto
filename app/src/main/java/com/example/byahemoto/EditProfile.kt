@@ -159,6 +159,7 @@ class EditProfile : AppCompatActivity() {
             .load(profilePicUrl)
             .placeholder(R.drawable.avatar)
             .error(R.drawable.avatar)
+            .circleCrop()
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .into(profileImageView)

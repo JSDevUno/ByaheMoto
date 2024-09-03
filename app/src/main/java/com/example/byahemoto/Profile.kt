@@ -63,7 +63,7 @@ class Profile : AppCompatActivity() {
         nameTextView = findViewById(R.id.textView4)
         emailTextView = findViewById(R.id.textView7)
         regionTextView = findViewById(R.id.textView11)
-        logoutLayout = findViewById(R.id.linearlayout)
+        logoutLayout = findViewById(R.id.linearlayout2)
 
         val editProfileButton = findViewById<ImageView>(R.id.imageView3)
         val backBtn = findViewById<ImageView>(R.id.backBtn)
@@ -131,7 +131,7 @@ class Profile : AppCompatActivity() {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val username = sharedPref.getString("username", "Unknown Name")
         val email = sharedPref.getString("email", "Unknown Email")
-        val phoneNumber = sharedPref.getString("phone_number", "")
+        val phoneNumber = sharedPref.getString("phone_number", "Add Number")
 
 
         // Load profile image
@@ -145,6 +145,7 @@ class Profile : AppCompatActivity() {
             .load(profilePicUrl)
             .placeholder(R.drawable.avatar)
             .error(R.drawable.avatar)
+            .circleCrop()
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .into(profileImageView)
