@@ -84,7 +84,7 @@ class Signup : AppCompatActivity() {
                 email,
                 password,
                 confirmPassword,
-                registration_type = "priority"
+                registration_type = "regular"
             )
             Log.d("Signup", "RegisterRequest: $registerRequest")
 

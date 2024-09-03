@@ -11,12 +11,13 @@
         android:id="@+id/TextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="15sp"
-        android:layout_marginTop="15sp"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/archivo_black"
         android:text="Wallet"
         android:textColor="@color/black"
-        android:textSize="24sp"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,6 +25,7 @@
         android:id="@+id/relativeLayout2"
         android:layout_width="match_parent"
         android:layout_height="3sp"
+        android:layout_marginTop="18dp"
         android:background="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,7 +70,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="3dp"
                 android:fontFamily="@font/archivo_black"
-                android:text="BIYAHEMOTO PAY"
+                android:text="BYAHEMOTO PAY"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -84,11 +86,13 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/top_history"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/BottomNavigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout4">
@@ -97,8 +101,10 @@
             android:id="@+id/Topup"
             android:layout_width="130dp"
             android:layout_height="match_parent"
-            android:layout_marginRight="20dp"
-            app:cardBackgroundColor="@color/bg">
+            android:layout_marginRight="10dp"
+            app:cardBackgroundColor="@color/bg"
+            app:cardElevation="10dp"
+            android:layout_margin="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -127,7 +133,9 @@
             android:layout_width="130dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="5dp"
-            app:cardBackgroundColor="@color/bg">
+            app:cardBackgroundColor="@color/bg"
+            app:cardElevation="10dp"
+            android:layout_margin="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -143,7 +151,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="History"
+                    android:text="Transaction History"
                     android:textAlignment="center"
                     android:textSize="18sp" />
             </LinearLayout>

@@ -35,17 +35,14 @@ class Wallet : AppCompatActivity() {
             }
         }
 
-        // Initialize CardViews
         val cardTopup = findViewById<CardView>(R.id.Topup)
         val cardTransacHistory = findViewById<CardView>(R.id.transacHistory)
 
-        // Set click listener for Topup CardView
         cardTopup.setOnClickListener {
             val intent = Intent(this, Topup::class.java)
             startActivity(intent)
         }
 
-        // Set click listener for Transaction History CardView
         cardTransacHistory.setOnClickListener {
             val intent = Intent(this, TransacHistory::class.java)
             startActivity(intent)

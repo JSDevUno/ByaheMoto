@@ -17,5 +17,6 @@ data class User(
     val username: String,
     val email: String,
     val full_name: String,
-    val phone_number: String?
+    val phone_number: String?,
+    val registration_type: String
 )

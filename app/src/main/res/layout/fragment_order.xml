@@ -5,10 +5,23 @@
     android:layout_height="match_parent"
     tools:context=".OrderFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <include
+        layout="@layout/layout_panels"
+        android:id="@+id/cardViewContainer"
+        android:visibility="visible" />
 
 </FrameLayout>

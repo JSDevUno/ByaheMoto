@@ -1,14 +1,20 @@
 package com.example.byahemoto
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class DriverDashboard : AppCompatActivity() {
+
+    private lateinit var ordersTextView: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_driver_dashboard)
+
+        ordersTextView = findViewById(R.id.orders)
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
 
@@ -16,25 +22,33 @@ class DriverDashboard : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_current -> {
                     loadFragment(CurrentFragment())
+                    updateOrdersTextView("CURRENT LOCATION")
                     true
                 }
                 R.id.nav_map -> {
                     loadFragment(MapFragment())
+                    updateOrdersTextView("MAP")
                     true
                 }
                 R.id.nav_order -> {
                     loadFragment(OrderFragment())
+                    updateOrdersTextView("ORDERS") // Update TextView when "Order" is selected
                     true
                 }
-                R.id.nav_menu -> {
+                R.id.nav_transac -> {
                     loadFragment(MenuFragment())
+                    updateOrdersTextView("TRANSACTIONS")
+                    true
+                }
+                R.id.nav_profile -> {
+                    loadFragment(MenuFragment())
+                    updateOrdersTextView("PROFILE")
                     true
                 }
                 else -> false
             }
         }
 
-        // Load default fragment
         if (savedInstanceState == null) {
             loadFragment(CurrentFragment())
         }
@@ -44,5 +58,9 @@ class DriverDashboard : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_layout, fragment)
             .commit()
+    }
+
+    private fun updateOrdersTextView(text: String) {
+        ordersTextView.text = text
     }
 }

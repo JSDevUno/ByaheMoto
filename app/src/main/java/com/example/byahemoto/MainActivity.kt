@@ -80,6 +80,7 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful && response.body() != null) {
                         val loginResponse = response.body()
                         if (loginResponse != null) {
+                            Log.d("UserLogin", "Login Response: ${loginResponse.toString()}")
                             if (rememberMeCheckBox.isChecked) {
                                 saveCredentials(username, password)
                             } else {
@@ -112,6 +113,7 @@ class MainActivity : AppCompatActivity() {
             putString("username", loginResponse.user.username)
             putString("email", loginResponse.user.email)
             putString("phone_number", loginResponse.user.phone_number)  // Save phone number
+            putString("registration_type", loginResponse.user.registration_type)
             apply()
         }
         saveTokenToPreferences(loginResponse.access_token) // Save token separately
@@ -150,6 +152,7 @@ class MainActivity : AppCompatActivity() {
             remove("email")
             remove("phone_number")
             remove("profile_pic_url")
+            remove("registration_type")
             apply()
         }
     }

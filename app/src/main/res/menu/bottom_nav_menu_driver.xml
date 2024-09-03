@@ -20,8 +20,13 @@
         android:title="Order"/>
 
     <item
-        android:id="@+id/nav_menu"
-        android:icon="@drawable/baseline_menu_24"
-        android:title="Menu"/>
+        android:id="@+id/nav_transac"
+        android:icon="@drawable/baseline_account_balance_wallet_24"
+        android:title="Transactions"/>
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/baseline_person_white"
+        android:title="Profile"/>
 
 </menu>
