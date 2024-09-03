@@ -20,6 +20,9 @@
         android:theme="@style/Theme.ByaheMoto"
         tools:targetApi="31">
         <activity
+            android:name=".EditProfileDriver"
+            android:exported="false" />
+        <activity
             android:name=".ProfileDriver"
             android:exported="false" />
         <activity
