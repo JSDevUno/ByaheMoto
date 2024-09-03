@@ -32,7 +32,7 @@ class DriverDashboard : AppCompatActivity() {
                 }
                 R.id.nav_order -> {
                     loadFragment(OrderFragment())
-                    updateOrdersTextView("ORDERS") // Update TextView when "Order" is selected
+                    updateOrdersTextView("ORDERS") 
                     true
                 }
                 R.id.nav_transac -> {
