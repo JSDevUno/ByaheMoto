@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.byahemoto.models.ErrorResponse
 import com.example.byahemoto.models.LoginResponse
+import com.example.byahemoto.models.Role
 import com.example.byahemoto.network.RetrofitInstance
 import com.google.gson.Gson
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -79,17 +80,22 @@ class DriverLogin : AppCompatActivity() {
                 ) {
                     if (response.isSuccessful && response.body() != null) {
                         val loginResponse = response.body()
-                        if (loginResponse != null) {
-                            Log.d("DriverLogin", "Login Response: ${loginResponse.toString()}")
-                            if (rememberMeCheckBox.isChecked) {
-                                saveCredentials(username, password)
-                            } else {
-                                clearSavedCredentials()
-                            }
-                            saveUserDetails(loginResponse)
 
-                            navigateToDashboard()
+                        if (loginResponse?.user?.role != Role.DRIVER) {
+                            handleLoginError(null)
+                            return
                         }
+
+                        Log.d("DriverLogin", "Login Response: ${loginResponse.toString()}")
+                        if (rememberMeCheckBox.isChecked) {
+                            saveCredentials(username, password)
+                        } else {
+                            clearSavedCredentials()
+                        }
+
+                        saveUserDetails(loginResponse)
+
+                        navigateToDashboard()
                     } else {
                         handleLoginError(response.errorBody())
                     }
@@ -113,7 +119,10 @@ class DriverLogin : AppCompatActivity() {
             putString("username", loginResponse.user.username)
             putString("email", loginResponse.user.email)
             putString("phone_number", loginResponse.user.phone_number)
-            putString("registration_type", loginResponse.user.registration_type) // Save registrationType
+            putString(
+                "registration_type",
+                loginResponse.user.registration_type
+            ) // Save registrationType
             apply()
         }
         saveTokenToPreferences(loginResponse.access_token)

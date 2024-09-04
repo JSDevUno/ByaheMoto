@@ -18,5 +18,12 @@ data class User(
     val email: String,
     val full_name: String,
     val phone_number: String?,
-    val registration_type: String
+    val registration_type: String,
+    val role: Role
 )
+
+enum class Role(val value: String) {
+    DRIVER("DRIVER"),
+    USER("USER"),
+    ADMIN("ADMIN")
+}
