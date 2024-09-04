@@ -53,7 +53,7 @@ class PriorityDriver : AppCompatActivity() {
         userTypeSpinner = findViewById(R.id.userTypeSpinnerDriver)
 
         val userTypeOptions =
-            arrayOf("None", "Student", "Senior", "PWD", "Driver")
+            arrayOf("Driver")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, userTypeOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         userTypeSpinner.adapter = adapter

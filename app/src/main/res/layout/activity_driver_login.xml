@@ -112,7 +112,7 @@
                 android:drawableLeft="@drawable/baseline_person_white"
                 android:drawablePadding="8dp"
                 android:fontFamily="@font/montserrat_alternates_light"
-                android:hint="Email"
+                android:hint="Email or Username"
                 android:padding="8dp"
                 android:textColor="@color/black" />
 
