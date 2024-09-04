@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.byahemoto.models.ErrorResponse
 import com.example.byahemoto.models.LoginResponse
+import com.example.byahemoto.models.Role
 import com.example.byahemoto.network.RetrofitInstance
 import com.google.gson.Gson
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -79,17 +80,23 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     if (response.isSuccessful && response.body() != null) {
                         val loginResponse = response.body()
-                        if (loginResponse != null) {
-                            Log.d("UserLogin", "Login Response: ${loginResponse.toString()}")
-                            if (rememberMeCheckBox.isChecked) {
-                                saveCredentials(username, password)
-                            } else {
-                                clearSavedCredentials()
-                            }
-                            saveUserDetails(loginResponse) // Save all user details and token
 
-                            navigateToDashboard()
+                        if (loginResponse?.user?.role != Role.USER) {
+                            handleLoginError(null)
+
+                            return
                         }
+
+                        Log.d("UserLogin", "Login Response: ${loginResponse.toString()}")
+
+                        if (rememberMeCheckBox.isChecked) {
+                            saveCredentials(username, password)
+                        } else {
+                            clearSavedCredentials()
+                        }
+                        saveUserDetails(loginResponse) // Save all user details and token
+
+                        navigateToDashboard()
                     } else {
                         handleLoginError(response.errorBody())
                     }
