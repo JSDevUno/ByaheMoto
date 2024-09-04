@@ -107,7 +107,7 @@ class DriverLogin : AppCompatActivity() {
     }
 
     private fun saveUserDetails(loginResponse: LoginResponse) {
-        val sharedPref = getSharedPreferences("driver_prefs", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putString("access_token", loginResponse.access_token)
             putString("username", loginResponse.user.username)
@@ -121,7 +121,7 @@ class DriverLogin : AppCompatActivity() {
 
 
     private fun saveCredentials(username: String, password: String) {
-        val sharedPref = getSharedPreferences("driver_prefs", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putString("username", username)
             putString("password", password)
@@ -130,7 +130,7 @@ class DriverLogin : AppCompatActivity() {
     }
 
     private fun loadSavedCredentials(): Boolean {
-        val sharedPref = getSharedPreferences("driver_prefs", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val savedUsername = sharedPref.getString("username", null)
         val savedPassword = sharedPref.getString("password", null)
 
@@ -145,7 +145,7 @@ class DriverLogin : AppCompatActivity() {
     }
 
     private fun clearSavedCredentials() {
-        val sharedPref = getSharedPreferences("driver_prefs", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             remove("username")
             remove("password")
@@ -180,7 +180,7 @@ class DriverLogin : AppCompatActivity() {
     }
 
     private fun saveTokenToPreferences(token: String) {
-        val sharedPref = getSharedPreferences("driver_prefs", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putString("auth_token", token)
             apply()

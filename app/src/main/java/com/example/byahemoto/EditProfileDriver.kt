@@ -1,11 +1,257 @@
 package com.example.byahemoto
 
-import androidx.appcompat.app.AppCompatActivity
+import android.Manifest
+import android.content.ContentValues.TAG
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.model.GlideUrl
+import com.example.byahemoto.models.ProfileUpdate
+import com.example.byahemoto.models.ProfileUpdateResponse
+import com.example.byahemoto.network.RetrofitInstance
+import com.example.byahemoto.utils.Constants
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.File
 
 class EditProfileDriver : AppCompatActivity() {
+
+    private lateinit var profileImageView: ImageView
+    private lateinit var saveButton: Button
+    private lateinit var phoneNumberEditText: EditText
+    private val PICK_IMAGE_REQUEST = 1
+    private var selectedImageUri: Uri? = null
+    private var selectedImageFile: File? = null
+    private val REQUEST_CODE_STORAGE_PERMISSION = 100
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile_driver)
+
+        profileImageView = findViewById(R.id.profileImageViewDriver)
+        saveButton = findViewById(R.id.saveButtonDriver)
+        phoneNumberEditText = findViewById(R.id.phoneNumberEditTextDriver)
+
+        profileImageView.setOnClickListener {
+            if (checkStoragePermission()) {
+                openFileManager()
+            } else {
+                requestStoragePermission()
+            }
+        }
+
+        saveButton.setOnClickListener {
+            saveProfileChanges()
+        }
+
+        loadCurrentProfileData()
+    }
+
+    private fun checkStoragePermission(): Boolean {
+        val result =
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        return result == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestStoragePermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+            REQUEST_CODE_STORAGE_PERMISSION
+        )
+    }
+
+    private fun openFileManager() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+    }
+
+    private fun saveProfileChanges() {
+        val token = getTokenFromPreferences()
+        Log.d("AuthToken", "Token: $token")
+
+        val phoneNumber = phoneNumberEditText.text.toString().trim()
+
+
+        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("phone_number", phoneNumber)
+            apply()
+        }
+
+
+        if (selectedImageFile != null) uploadProfilePicture(token, selectedImageFile!!)
+
+
+        if (phoneNumber.isEmpty()) {
+            finish()
+            return
+        }
+
+        val profileUpdate = ProfileUpdate(phoneNumber = phoneNumber)
+
+        RetrofitInstance.authService.updateProfile(token, profileUpdate)
+            .enqueue(object : Callback<ProfileUpdateResponse> {
+                override fun onResponse(
+                    call: Call<ProfileUpdateResponse>,
+                    response: Response<ProfileUpdateResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(
+                            this@EditProfileDriver,
+                            "Profile updated successfully",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.d(TAG, "Profile update response: ${response.body()}")
+                        finish() // Go back to profile page after saving changes
+                    } else {
+                        val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                        Toast.makeText(
+                            this@EditProfileDriver,
+                            "Failed to update profile: $errorBody",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.e(TAG, "Profile update failed: $errorBody")
+                    }
+                }
+
+                override fun onFailure(call: Call<ProfileUpdateResponse>, t: Throwable) {
+                    Toast.makeText(
+                        this@EditProfileDriver,
+                        "An error occurred: ${t.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.e(TAG, "Profile update error: ${t.message}", t)
+                }
+            })
+    }
+
+    private fun loadCurrentProfileData() {
+        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val phoneNumber = sharedPref.getString("phone_number", "")
+        phoneNumberEditText.setText(phoneNumber)
+
+        val profilePicUrl = GlideUrl("${Constants.BASE_URL}/profile/picture") {
+            mapOf(
+                Pair("Authorization", "Bearer ${sharedPref.getString("access_token", "")}")
+            )
+        }
+
+        Glide.with(this)
+            .load(profilePicUrl)
+            .placeholder(R.drawable.avatar)
+            .error(R.drawable.avatar)
+            .circleCrop()
+            .skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .into(profileImageView)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            selectedImageUri = data.data
+            selectedImageUri?.let { uri ->
+                val filePath = getRealPathFromURI(uri)
+                filePath?.let { path ->
+                    selectedImageFile = File(path)
+                    profileImageView.setImageURI(uri)
+                }
+            }
+        }
+    }
+
+    private fun getRealPathFromURI(uri: Uri): String? {
+        var result: String? = null
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        if (cursor != null) {
+            cursor.moveToFirst()
+            val idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+            result = cursor.getString(idx)
+            cursor.close()
+        }
+        return result
+    }
+
+    private fun uploadProfilePicture(token: String, file: File) {
+        val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+        val body = MultipartBody.Part.createFormData("profilePicture", file.name, requestFile)
+
+        RetrofitInstance.authService.updateProfilePicture(token, body)
+            .enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        selectedImageFile = null
+
+                        val phoneNumber = phoneNumberEditText.text.toString().trim()
+
+                        if (phoneNumber.isEmpty()) {
+                            finish()
+                            return
+                        }
+                        saveProfileChanges()
+                    } else {
+                        val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                        Toast.makeText(
+                            this@EditProfileDriver,
+                            "Failed to update profile picture: $errorBody",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    Toast.makeText(
+                        this@EditProfileDriver,
+                        "An error occurred: ${t.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+    }
+
+    private fun getTokenFromPreferences(): String {
+        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+        val token = sharedPref.getString("access_token", "") ?: ""
+        Log.d("AuthToken", "Retrieved token: $token")
+        return "Bearer $token"
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openFileManager()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Storage permission is required to select a profile picture",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 }

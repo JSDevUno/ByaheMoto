@@ -1,5 +1,6 @@
 package com.example.byahemoto
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -41,8 +42,8 @@ class DriverDashboard : AppCompatActivity() {
                     true
                 }
                 R.id.nav_profile -> {
-                    loadFragment(MenuFragment())
-                    updateOrdersTextView("PROFILE")
+                    val intent = Intent(this, ProfileDriver::class.java)
+                    startActivity(intent)
                     true
                 }
                 else -> false

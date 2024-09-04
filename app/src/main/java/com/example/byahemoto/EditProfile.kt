@@ -151,7 +151,7 @@ class EditProfile : AppCompatActivity() {
 
         val profilePicUrl = GlideUrl("${Constants.BASE_URL}/profile/picture") {
             mapOf(
-                Pair("Authorization", "Bearer ${sharedPref.getString("auth_token", "")}")
+                Pair("Authorization", "Bearer ${sharedPref.getString("access_token", "")}")
             )
         }
 
@@ -231,7 +231,7 @@ class EditProfile : AppCompatActivity() {
 
     private fun getTokenFromPreferences(): String {
         val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        val token = sharedPref.getString("auth_token", "") ?: ""
+        val token = sharedPref.getString("access_token", "") ?: ""
         Log.d("AuthToken", "Retrieved token: $token")
         return "Bearer $token"
     }
