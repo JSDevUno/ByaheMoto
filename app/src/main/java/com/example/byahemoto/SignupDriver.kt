@@ -24,6 +24,7 @@ class SignupDriver : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var confirmPasswordEditText: EditText
     private lateinit var createAccButton: Button
+    private lateinit var createPriorityAccButtonDriver: Button
     private lateinit var backBtnDriver: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +36,7 @@ class SignupDriver : AppCompatActivity() {
         usernameEditText = findViewById(R.id.usernameDriver)
         passwordEditText = findViewById(R.id.passwordDriver1)
         confirmPasswordEditText = findViewById(R.id.confirmPasswordDriver1)
+        createPriorityAccButtonDriver = findViewById(R.id.verifyAcc)
         createAccButton = findViewById(R.id.createAccDriver)
         backBtnDriver = findViewById(R.id.backBtnDriver)
 
@@ -50,6 +52,9 @@ class SignupDriver : AppCompatActivity() {
             }
         }
 
+        createPriorityAccButtonDriver.setOnClickListener {
+            navigateToSignup()
+        }
         backBtnDriver.setOnClickListener {
             onBackPressed()
         }
@@ -157,5 +162,9 @@ class SignupDriver : AppCompatActivity() {
                     ).show()
                 }
             })
+    }
+    private fun navigateToSignup() {
+        val intent = Intent(this, PriorityDriver::class.java)
+        startActivity(intent)
     }
 }

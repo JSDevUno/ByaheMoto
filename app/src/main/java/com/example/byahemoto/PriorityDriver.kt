@@ -23,7 +23,7 @@ import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
 
-class Signup : AppCompatActivity() {
+class PriorityDriver : AppCompatActivity() {
     private lateinit var selectButton: Button
     private lateinit var idVerification: TextView
     private lateinit var fullNameEditText: EditText
@@ -36,24 +36,24 @@ class Signup : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_signup)
+        setContentView(R.layout.activity_priority_driver)
 
         val backBtn = findViewById<ImageView>(R.id.backBtn)
         backBtn.setOnClickListener {
             onBackPressed()
         }
 
-        selectButton = findViewById(R.id.selectButton)
-        idVerification = findViewById(R.id.idVerification)
-        fullNameEditText = findViewById(R.id.fullName1)
-        usernameEditText = findViewById(R.id.username1)
-        emailEditText = findViewById(R.id.email1)
-        passwordEditText = findViewById(R.id.passwordEditText)
-        confirmPasswordEditText = findViewById(R.id.passwordEditText2)
-        userTypeSpinner = findViewById(R.id.userTypeSpinner)
+        selectButton = findViewById(R.id.selectButtonDriver)
+        idVerification = findViewById(R.id.idVerificationDriver)
+        fullNameEditText = findViewById(R.id.fullName1Driver)
+        usernameEditText = findViewById(R.id.username1Driver)
+        emailEditText = findViewById(R.id.email1Driver)
+        passwordEditText = findViewById(R.id.passwordEditTextDriver)
+        confirmPasswordEditText = findViewById(R.id.passwordEditText2Driver)
+        userTypeSpinner = findViewById(R.id.userTypeSpinnerDriver)
 
         val userTypeOptions =
-            arrayOf("None", "Student", "Senior", "PWD", "Driver") // Remove this and the options in the XML file
+            arrayOf("None", "Student", "Senior", "PWD", "Driver")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, userTypeOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         userTypeSpinner.adapter = adapter
@@ -64,7 +64,7 @@ class Signup : AppCompatActivity() {
             startActivityForResult(intent, 1)
         }
 
-        val createAccButton = findViewById<Button>(R.id.createAcc1)
+        val createAccButton = findViewById<Button>(R.id.createAcc1Driver)
         createAccButton.setOnClickListener {
             val fullName = fullNameEditText.text?.toString()?.trim() ?: ""
             val username = usernameEditText.text?.toString()?.trim() ?: ""
@@ -125,8 +125,8 @@ class Signup : AppCompatActivity() {
 
                         if (!response.isSuccessful) {
                             Toast.makeText(
-                                this@Signup,
-                                "Failed to send signup request. Please try again.",
+                                this@PriorityDriver,
+                                "Failed to send verification request. Please try again.",
                                 Toast.LENGTH_SHORT
                             ).show()
                             return
@@ -139,7 +139,7 @@ class Signup : AppCompatActivity() {
 
                         if (userId.isEmpty()) {
                             Toast.makeText(
-                                this@Signup,
+                                this@PriorityDriver,
                                 "User ID not found in the response.",
                                 Toast.LENGTH_SHORT
                             ).show()
@@ -163,14 +163,14 @@ class Signup : AppCompatActivity() {
                                 )
                                 if (response.isSuccessful) {
                                     Toast.makeText(
-                                        this@Signup,
+                                        this@PriorityDriver,
                                         "Signup request and verification sent successfully! Await admin approval.",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     finish()
                                 } else {
                                     Toast.makeText(
-                                        this@Signup,
+                                        this@PriorityDriver,
                                         "Failed to send verification request. Please try again.",
                                         Toast.LENGTH_SHORT
                                     ).show()
@@ -180,7 +180,7 @@ class Signup : AppCompatActivity() {
                             override fun onFailure(call: Call<Void>, t: Throwable) {
                                 Log.e("Signup", "Verification Request Failed: ${t.message}", t)
                                 Toast.makeText(
-                                    this@Signup,
+                                    this@PriorityDriver,
                                     "An error occurred: ${t.message}",
                                     Toast.LENGTH_SHORT
                                 ).show()
@@ -191,7 +191,7 @@ class Signup : AppCompatActivity() {
                     override fun onFailure(call: Call<SignupResponse>, t: Throwable) {
                         Log.e("Signup", "Signup Request Failed: ${t.message}", t)
                         Toast.makeText(
-                            this@Signup,
+                            this@PriorityDriver,
                             "An error occurred: ${t.message}",
                             Toast.LENGTH_SHORT
                         ).show()

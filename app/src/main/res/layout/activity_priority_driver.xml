@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg"
-    tools:context=".SignupDriver">
+    tools:context=".PriorityDriver">
 
     <View
         android:id="@+id/topPanel"
         android:layout_width="match_parent"
         android:layout_height="210dp"
-        android:background="@drawable/bg_view"/>
+        android:background="@drawable/bg_view" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -19,22 +19,22 @@
         android:padding="35dp">
 
         <ImageView
-            android:id="@+id/backBtnDriver"
+            android:id="@+id/backBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_arrow_back_ios_24"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="1dp"/>
+            android:layout_marginTop="1dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:fontFamily="@font/montserrat"
+            android:fontFamily="@font/montserrat_alternates_light"
             android:paddingTop="50dp"
-            android:text="CREATE VERIFIED ACCOUNT"
+            android:text="SIGN UP NOW!"
             android:textAlignment="center"
             android:textAppearance="@style/Base.Theme.ByaheMoto"
             android:textColor="@color/white"
@@ -43,40 +43,29 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="704dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/topPanel"
-        android:layout_gravity="bottom"
         android:orientation="vertical"
-        android:padding="29dp">
+        android:paddingLeft="29dp"
+        android:paddingRight="29dp"
+        android:paddingTop="15dp">
 
         <EditText
-            android:id="@+id/emailDriver"
+            android:id="@+id/fullName1Driver"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginTop="0dp"
             android:background="@drawable/custom_panel"
             android:backgroundTint="@color/white"
-            android:drawableLeft="@drawable/baseline_alternate_email_24"
-            android:drawablePadding="8dp"
-            android:fontFamily="@font/montserrat_alternates_light"
-            android:hint="Email"
-            android:paddingLeft="18dp"
-            android:textColor="@color/black" />
-        <EditText
-            android:id="@+id/fullNameDriver"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/custom_panel"
-            android:backgroundTint="@color/white"
             android:drawableLeft="@drawable/baseline_person_gray"
             android:drawablePadding="8dp"
             android:fontFamily="@font/montserrat_alternates_light"
-            android:hint="FullName"
+            android:hint="Full Name"
             android:paddingLeft="18dp"
             android:textColor="@color/black" />
+
         <EditText
-            android:id="@+id/usernameDriver"
+            android:id="@+id/username1Driver"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginTop="10dp"
@@ -89,8 +78,22 @@
             android:paddingLeft="18dp"
             android:textColor="@color/black" />
 
+        <EditText
+            android:id="@+id/email1Driver"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/custom_panel"
+            android:backgroundTint="@color/white"
+            android:drawableLeft="@drawable/baseline_alternate_email_24"
+            android:drawablePadding="8dp"
+            android:fontFamily="@font/montserrat_alternates_light"
+            android:hint="Email"
+            android:paddingLeft="18dp"
+            android:textColor="@color/black" />
+
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/passwordDriver"
+            android:id="@+id/passwordInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -100,7 +103,7 @@
             app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/passwordDriver1"
+                android:id="@+id/passwordEditTextDriver"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
@@ -110,13 +113,12 @@
                 android:background="@drawable/custom_panel"
                 android:textColor="@color/black"
                 android:fontFamily="@font/montserrat_alternates_light"
-                android:paddingRight="40dp"/>
+                android:paddingRight="40dp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/confirmPasswordDriver"
+            android:id="@+id/passwordInputLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -125,7 +127,7 @@
             app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/confirmPasswordDriver1"
+                android:id="@+id/passwordEditText2Driver"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
@@ -135,11 +137,51 @@
                 android:background="@drawable/custom_panel"
                 android:textColor="@color/black"
                 android:fontFamily="@font/montserrat_alternates_light"
-                android:paddingRight="40dp"/>
+                android:paddingRight="40dp" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
+        <Spinner
+            android:id="@+id/userTypeSpinnerDriver"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/custom_panel"
+            android:backgroundTint="@color/white"
+            android:paddingLeft="18dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/idVerificationDriver"
+                android:layout_marginRight="10dp"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="0dp"
+                android:background="@drawable/custom_panel"
+                android:backgroundTint="@color/white"
+                android:drawablePadding="8dp"
+                android:fontFamily="@font/montserrat_alternates_light"
+                android:text="ID path"
+                android:textAlignment="center"
+                android:paddingTop="20dp"
+                android:textColor="@color/field" />
+
+            <Button
+                android:id="@+id/selectButtonDriver"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:backgroundTint="#0a9dea"
+                android:text="Select ID" />
+        </LinearLayout>
+
         <Button
-            android:id="@+id/createAccDriver"
+            android:id="@+id/createAcc1Driver"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="10dp"
@@ -148,19 +190,5 @@
             android:text="Create Account"
             android:textSize="18sp"
             app:cornerRadius="50dp" />
-
-        <Button
-            android:id="@+id/verifyAcc"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="10dp"
-            android:backgroundTint="#FFA500"
-            android:fontFamily="@font/montserrat_alternates_semibold"
-            android:text="Create Verified Account"
-            android:textSize="18sp"
-            app:cornerRadius="50dp" />
-
-
     </LinearLayout>
-
 </RelativeLayout>

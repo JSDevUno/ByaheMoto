@@ -17,7 +17,7 @@ object RetrofitInstance {
 
     private val retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("https://fond-beagle-prime.ngrok-free.app")
+            .baseUrl("http://10.0.2.2:8000")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
