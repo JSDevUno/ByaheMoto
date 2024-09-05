@@ -7,31 +7,34 @@
     android:background="@color/bg"
     tools:context=".Topup">
 
-    <TextView
-        android:id="@+id/textView12"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="20dp"
-        android:fontFamily="@font/archivo_black"
-        android:text="Top Up"
-        android:textColor="@color/black"
-        android:textSize="34sp"
+    <View
+        android:id="@+id/topPanel"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="0dp"
+        android:background="@color/main2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <RelativeLayout
-        android:id="@+id/relativeLayout7"
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:background="@android:color/black"
-        app:layout_constraintTop_toBottomOf="@+id/textView12">
-
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/archivo_black"
+        android:text="Ride History"
+        android:textColor="@color/black"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/topPanel"
+        app:layout_constraintEnd_toEndOf="@+id/topPanel"
+        app:layout_constraintStart_toStartOf="@+id/topPanel"
+        app:layout_constraintTop_toTopOf="@+id/topPanel" />
 
     <TextView
         android:id="@+id/textView13"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="60dp"
@@ -40,26 +43,19 @@
         android:textColor="@color/black"
         android:textSize="32sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout7" />
+        app:layout_constraintTop_toBottomOf="@+id/topPanel" />
 
-    <com.google.android.material.textfield.TextInputLayout
+    <EditText
         android:id="@+id/textInputLayout"
         android:layout_width="409dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginTop="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView13">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/custom_textfield"
-            android:hint="Between 20 and 3000"
-            android:textColor="@color/black" />
-    </com.google.android.material.textfield.TextInputLayout>
+        app:layout_constraintTop_toBottomOf="@+id/textView13"
+        android:background="@drawable/book_btn"
+        android:hint="Between 20 and 3000"
+        android:paddingLeft="20dp"/>
 
     <LinearLayout
         android:id="@+id/linearLayout2"

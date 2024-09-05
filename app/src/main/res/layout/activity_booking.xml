@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             android:text="ByaheMoto!"
             android:fontFamily="@font/archivo_black"
+            android:textColor="@color/black"
             android:textSize="40sp"/>
 
     </LinearLayout>
@@ -57,7 +58,104 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map"
-        app:layout_constraintVertical_weight="1">
+        app:layout_constraintVertical_weight="1"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+           <LinearLayout
+               android:id="@+id/methods"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               android:layout_gravity="center">
+                <LinearLayout
+                    android:id="@+id/TA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_weight="1">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Total Amount"
+                        android:textAlignment="center"
+                        android:textSize="20sp"
+                        android:fontFamily="@font/montserrat_alternates_bold"/>
+                    <LinearLayout
+                        android:id="@+id/totalAmountBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="30sp"
+                            android:textColor="@color/main2"
+                            android:layout_marginRight="5dp"
+                            android:text="₱"/>
+                        <TextView
+                            android:id="@+id/amount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="50"
+                            android:textSize="20sp"/>
+                    </LinearLayout>
+                </LinearLayout>
+               <LinearLayout
+                   android:id="@+id/PM"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:orientation="vertical"
+                   android:layout_weight="1">
+
+                   <TextView
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:text="Payment Method"
+                       android:textAlignment="center"
+                       android:textSize="20sp"
+                       android:fontFamily="@font/montserrat_alternates_bold"/>
+                   <LinearLayout
+                       android:id="@+id/paymentMethodBtn"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:orientation="horizontal"
+                       android:gravity="center">
+
+                       <TextView
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:textSize="30sp"
+                           android:textColor="@color/main2"
+                           android:layout_marginRight="5dp"
+                           android:text="₱"/>
+
+                       <Spinner
+                           android:id="@+id/paymentMethodSpinner"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:spinnerMode="dropdown"/>
+
+                   </LinearLayout>
+
+               </LinearLayout>
+           </LinearLayout>
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:background="@drawable/book_btn"
+                android:text="Confirm Booking"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/archivo_black"/>
+        </LinearLayout>
     </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

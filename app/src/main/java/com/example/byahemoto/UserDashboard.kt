@@ -2,19 +2,18 @@ package com.example.byahemoto
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.cardview.widget.CardView
 
 class UserDashboard : AppCompatActivity() {
 
     private lateinit var bottomNavigationView: BottomNavigationView
-
-    private val activityMap = mapOf(
-        R.id.nav_home to UserDashboard::class.java,
-        R.id.nav_history to History::class.java,
-        R.id.nav_wallet to Wallet::class.java,
-        R.id.nav_profile to Profile::class.java
-    )
+    private lateinit var card1: CardView
+    private lateinit var card2: CardView
+    private lateinit var card3: CardView
+    private lateinit var card4: CardView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,15 +21,52 @@ class UserDashboard : AppCompatActivity() {
 
         bottomNavigationView = findViewById(R.id.BottomNavigation)
 
+        card1 = findViewById(R.id.card1)
+        card2 = findViewById(R.id.card2)
+        card3 = findViewById(R.id.card3)
+        card4 = findViewById(R.id.card4)
+
+        card1.setOnClickListener {
+            openBookingActivity()
+        }
+
+        card2.setOnClickListener {
+            openBookingActivity()
+        }
+
+        card3.setOnClickListener {
+            openBookingActivity()
+        }
+
+        card4.setOnClickListener {
+            openBookingActivity()
+        }
+
         bottomNavigationView.setOnItemSelectedListener { menuItem ->
-            val activityClass = activityMap[menuItem.itemId]
-            if (activityClass != null) {
-                val intent = Intent(this, activityClass)
-                startActivity(intent)
-                true
-            } else {
-                false
+            when (menuItem.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, UserDashboard::class.java))
+                    true
+                }
+                R.id.nav_history -> {
+                    startActivity(Intent(this, History::class.java))
+                    true
+                }
+                R.id.nav_wallet -> {
+                    startActivity(Intent(this, Wallet::class.java))
+                    true
+                }
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, Profile::class.java))
+                    true
+                }
+                else -> false
             }
         }
+    }
+
+    private fun openBookingActivity() {
+        val intent = Intent(this, Booking::class.java)
+        startActivity(intent)
     }
 }

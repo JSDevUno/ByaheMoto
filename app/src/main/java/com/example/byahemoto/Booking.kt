@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -29,6 +31,7 @@ import retrofit2.Response
 
 class Booking : AppCompatActivity(), OnMapReadyCallback {
 
+    private lateinit var paymentMethodSpinner: Spinner
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -45,6 +48,11 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_booking)
+        paymentMethodSpinner = findViewById(R.id.paymentMethodSpinner)
+        val paymentMethods = arrayOf("CASH", "PAYPAL")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, paymentMethods)
+        paymentMethodSpinner.adapter = adapter
+
 
         bottomNavigationView = findViewById(R.id.BottomNavigation)
         bottomNavigationView.setOnItemSelectedListener { menuItem ->
