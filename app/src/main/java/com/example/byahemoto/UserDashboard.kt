@@ -21,10 +21,10 @@ class UserDashboard : AppCompatActivity() {
 
         bottomNavigationView = findViewById(R.id.BottomNavigation)
 
-        card1 = findViewById(R.id.card1)
-        card2 = findViewById(R.id.card2)
-        card3 = findViewById(R.id.card3)
-        card4 = findViewById(R.id.card4)
+        card1 = findViewById(R.id.EMC)
+        card2 = findViewById(R.id.ECART)
+        card3 = findViewById(R.id.MOTORCYCLE)
+        card4 = findViewById(R.id.TRICYCLE)
 
         card1.setOnClickListener {
             openBookingActivity()
