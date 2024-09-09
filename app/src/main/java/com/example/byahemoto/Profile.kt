@@ -57,7 +57,6 @@ class Profile : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-
         profileImageView = findViewById(R.id.imageView2)
         phoneNumberTextView = findViewById(R.id.textView10)
         nameTextView = findViewById(R.id.textView4)
@@ -68,9 +67,7 @@ class Profile : AppCompatActivity() {
         val editProfileButton = findViewById<ImageView>(R.id.imageView3)
         val backBtn = findViewById<ImageView>(R.id.backBtn)
 
-
         profileImageView.setImageResource(R.drawable.avatar)
-
 
         bottomNavigationView = findViewById(R.id.BottomNavigation)
         bottomNavigationView.selectedItemId = R.id.nav_profile
@@ -86,20 +83,16 @@ class Profile : AppCompatActivity() {
             }
         }
 
-
         editProfileButton.setOnClickListener {
             val intent = Intent(this, EditProfile::class.java)
             startActivityForResult(intent, REQUEST_CODE_EDIT_PROFILE)
         }
 
-
         logoutLayout.setOnClickListener {
             logout()
         }
 
-
         loadUserData()
-
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
@@ -133,8 +126,7 @@ class Profile : AppCompatActivity() {
         val email = sharedPref.getString("email", "Unknown Email")
         val phoneNumber = sharedPref.getString("phone_number", "Add Number")
 
-
-        // Load profile image
+        // Load profile image with the correct token
         val profilePicUrl = GlideUrl("${Constants.BASE_URL}/profile/picture") {
             mapOf(
                 Pair("Authorization", "Bearer ${sharedPref.getString("access_token", "")}")
@@ -192,7 +184,6 @@ class Profile : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
         loadUserData()
     }
 

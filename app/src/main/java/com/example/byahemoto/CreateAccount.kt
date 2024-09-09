@@ -117,7 +117,9 @@ class CreateAccount : AppCompatActivity() {
     ) {
         val registerRequest = RegisterRequest(fullName, username, email, password, confirmPassword)
         Log.d("SignupDriver", "Register Request: $registerRequest")
-        RetrofitInstance.authService.register(registerRequest)
+
+        // Ensure context is passed to RetrofitInstance
+        RetrofitInstance.getAuthService(this).register(registerRequest)
             .enqueue(object : Callback<SignupResponse> {
                 override fun onResponse(
                     call: Call<SignupResponse>,

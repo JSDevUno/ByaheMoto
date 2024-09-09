@@ -1,8 +1,8 @@
 package com.example.byahemoto
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.cardview.widget.CardView
@@ -26,21 +26,10 @@ class UserDashboard : AppCompatActivity() {
         card3 = findViewById(R.id.MOTORCYCLE)
         card4 = findViewById(R.id.TRICYCLE)
 
-        card1.setOnClickListener {
-            openBookingActivity()
-        }
-
-        card2.setOnClickListener {
-            openBookingActivity()
-        }
-
-        card3.setOnClickListener {
-            openBookingActivity()
-        }
-
-        card4.setOnClickListener {
-            openBookingActivity()
-        }
+        card1.setOnClickListener { openBookingActivity("EMC") }
+        card2.setOnClickListener { openBookingActivity("ECART") }
+        card3.setOnClickListener { openBookingActivity("MOTORCYCLE") }
+        card4.setOnClickListener { openBookingActivity("TRICYCLE") }
 
         bottomNavigationView.setOnItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
@@ -65,8 +54,9 @@ class UserDashboard : AppCompatActivity() {
         }
     }
 
-    private fun openBookingActivity() {
+    private fun openBookingActivity(vehicleType: String) {
         val intent = Intent(this, Booking::class.java)
+        intent.putExtra("vehicleType", vehicleType)
         startActivity(intent)
     }
 }

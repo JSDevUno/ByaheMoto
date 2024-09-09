@@ -17,7 +17,6 @@ import com.example.byahemoto.network.RetrofitInstance
 import com.google.gson.Gson
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -51,8 +50,7 @@ class MainActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString().trim()
 
             if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please enter username and password", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(this, "Please enter username and password", Toast.LENGTH_SHORT).show()
             } else {
                 login(username, password)
             }
@@ -69,24 +67,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun login(username: String, password: String) {
-        val logger = HttpLoggingInterceptor()
-        logger.setLevel(HttpLoggingInterceptor.Level.BODY)
-
-        RetrofitInstance.authService.login(username.toRequestBody(), password.toRequestBody())
+        RetrofitInstance.getAuthService(this).login(username.toRequestBody(), password.toRequestBody())
             .enqueue(object : Callback<LoginResponse> {
-                override fun onResponse(
-                    call: Call<LoginResponse>,
-                    response: Response<LoginResponse>
-                ) {
+                override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                     if (response.isSuccessful && response.body() != null) {
                         val loginResponse = response.body()
 
                         if (loginResponse?.user?.role != Role.USER) {
                             handleLoginError(null)
-
                             return
                         }
 
+                        // Log success
                         Log.d("UserLogin", "Login Response: ${loginResponse.toString()}")
 
                         if (rememberMeCheckBox.isChecked) {
@@ -94,9 +86,9 @@ class MainActivity : AppCompatActivity() {
                         } else {
                             clearSavedCredentials()
                         }
-                        saveUserDetails(loginResponse) // Save all user details and token
 
-                        navigateToDashboard()
+                        saveUserDetails(loginResponse) // Save user details and token
+                        navigateToDashboard() // Go to the dashboard
                     } else {
                         handleLoginError(response.errorBody())
                     }
@@ -104,11 +96,7 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                     Log.e("MainActivity", "Error logging in", t)
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Login failed: ${t.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@MainActivity, "Login failed: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
     }
@@ -117,13 +105,14 @@ class MainActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putString("access_token", loginResponse.access_token)
+            putString("refresh_token", loginResponse.refresh_token)
+            putInt("user_id", loginResponse.user.id)
             putString("username", loginResponse.user.username)
             putString("email", loginResponse.user.email)
-            putString("phone_number", loginResponse.user.phone_number)  // Save phone number
+            putString("phone_number", loginResponse.user.phone_number)
             putString("registration_type", loginResponse.user.registration_type)
             apply()
         }
-        saveTokenToPreferences(loginResponse.access_token) // Save token separately
     }
 
     private fun saveCredentials(username: String, password: String) {
@@ -153,13 +142,7 @@ class MainActivity : AppCompatActivity() {
     private fun clearSavedCredentials() {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
-            remove("username")
-            remove("password")
-            remove("access_token")
-            remove("email")
-            remove("phone_number")
-            remove("profile_pic_url")
-            remove("registration_type")
+            clear() // Clear all user-specific data
             apply()
         }
     }
@@ -174,22 +157,12 @@ class MainActivity : AppCompatActivity() {
         errorBody?.let {
             try {
                 val json = Gson().fromJson(it.string(), ErrorResponse::class.java)
-                json?.let {
-                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
-                }
+                Toast.makeText(this, json.message, Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 Toast.makeText(this, "Login Failed.", Toast.LENGTH_SHORT).show()
             }
         } ?: run {
             Toast.makeText(this, "Login Failed.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun saveTokenToPreferences(token: String) {
-        val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        with(sharedPref.edit()) {
-            putString("auth_token", token)
-            apply()
         }
     }
 }

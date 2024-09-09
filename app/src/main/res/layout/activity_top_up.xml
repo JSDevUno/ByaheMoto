@@ -36,31 +36,32 @@
         android:id="@+id/textView13"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
         android:layout_marginTop="60dp"
         android:fontFamily="@font/archivo_black"
+        android:gravity="center"
         android:text="AMOUNT"
         android:textColor="@color/black"
         android:textSize="32sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topPanel" />
 
     <EditText
         android:id="@+id/textInputLayout"
-        android:layout_width="409dp"
+        android:layout_width="350dp"
         android:layout_height="50dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView13"
-        android:background="@drawable/book_btn"
+        android:background="@drawable/stroke"
         android:hint="Between 20 and 3000"
         android:paddingLeft="20dp"/>
 
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:orientation="vertical"
@@ -68,23 +69,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
 
-        <RadioButton
-            android:id="@+id/radioButton3"
+        <TextView
+            android:id="@+id/paypal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="PAYPAL"
-            android:textSize="24sp" />
-
-        <RadioButton
-            android:id="@+id/radioButton4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="CARD"
-            android:textSize="24sp" />
+            android:text="PayPal Account"
+            android:layout_marginTop="15dp"
+            android:fontFamily="@font/archivo_black"
+            android:gravity="center"
+            android:textSize="30sp" />
 
     </LinearLayout>
 
     <RelativeLayout
+        android:id="@+id/refill"
         android:layout_width="230dp"
         android:layout_height="50dp"
         android:layout_marginBottom="56dp"
@@ -96,7 +94,6 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
-            android:id="@+id/textView14"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/archivo_black"

@@ -19,7 +19,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.model.GlideUrl
 import com.example.byahemoto.utils.Constants
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ProfileDriver : AppCompatActivity() {
 
@@ -31,7 +30,6 @@ class ProfileDriver : AppCompatActivity() {
     private lateinit var phoneNumberTextView: TextView
     private lateinit var locationManager: LocationManager
     private val REQUEST_CODE_EDIT_PROFILE = 1001
-
 
     private val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
@@ -50,7 +48,6 @@ class ProfileDriver : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile_driver)
 
-
         profileImageView = findViewById(R.id.imageView2Driver)
         phoneNumberTextView = findViewById(R.id.textView10Driver)
         nameTextView = findViewById(R.id.textView4Driver)
@@ -61,23 +58,18 @@ class ProfileDriver : AppCompatActivity() {
         val editProfileButton = findViewById<ImageView>(R.id.imageView3Driver)
         val backBtn = findViewById<ImageView>(R.id.backBtnDriver)
 
-
         profileImageView.setImageResource(R.drawable.avatar)
 
-
         editProfileButton.setOnClickListener {
-            val intent = Intent(this, EditProfile::class.java)
+            val intent = Intent(this, EditProfileDriver::class.java)
             startActivityForResult(intent, REQUEST_CODE_EDIT_PROFILE)
         }
-
 
         logoutLayout.setOnClickListener {
             logout()
         }
 
-
         loadUserData()
-
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
@@ -111,8 +103,7 @@ class ProfileDriver : AppCompatActivity() {
         val email = sharedPref.getString("email", "Unknown Email")
         val phoneNumber = sharedPref.getString("phone_number", "Add Number")
 
-
-        // Load profile image
+        // Load profile image using authenticated driver's token
         val profilePicUrl = GlideUrl("${Constants.BASE_URL}/profile/picture") {
             mapOf(
                 Pair("Authorization", "Bearer ${sharedPref.getString("access_token", "")}")
@@ -170,7 +161,6 @@ class ProfileDriver : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
         loadUserData()
     }
 

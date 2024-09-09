@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.*
@@ -14,7 +13,6 @@ import com.example.byahemoto.models.SignupResponse
 import com.example.byahemoto.network.RetrofitInstance
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
@@ -52,8 +50,7 @@ class Signup : AppCompatActivity() {
         confirmPasswordEditText = findViewById(R.id.passwordEditText2)
         userTypeSpinner = findViewById(R.id.userTypeSpinner)
 
-        val userTypeOptions =
-            arrayOf("None", "Student", "Senior", "PWD", "Driver") // Remove this and the options in the XML file
+        val userTypeOptions = arrayOf("None", "Student", "Senior", "PWD", "Driver")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, userTypeOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         userTypeSpinner.adapter = adapter
@@ -112,7 +109,8 @@ class Signup : AppCompatActivity() {
 
             Log.d("Signup", "File Part: $filePart")
 
-            RetrofitInstance.authService.register(registerRequest)
+            // Using the token-based API calls
+            RetrofitInstance.getAuthService(this).register(registerRequest)
                 .enqueue(object : Callback<SignupResponse> {
                     override fun onResponse(
                         call: Call<SignupResponse>,
@@ -148,7 +146,8 @@ class Signup : AppCompatActivity() {
 
                         val identityType = userType.uppercase().toRequestBody(MultipartBody.FORM)
 
-                        RetrofitInstance.authService.sendVerificationRequest(
+                        // Send the verification request with token
+                        RetrofitInstance.getAuthService(this@Signup).sendVerificationRequest(
                             filePart,
                             userId.toRequestBody(MultipartBody.FORM),
                             identityType
@@ -229,5 +228,4 @@ class Signup : AppCompatActivity() {
         }
         return file
     }
-
 }

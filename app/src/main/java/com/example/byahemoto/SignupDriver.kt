@@ -124,7 +124,9 @@ class SignupDriver : AppCompatActivity() {
             registration_type = registrationType
         )
         Log.d("SignupDriver", "Register Request: $registerRequest")
-        RetrofitInstance.authService.register(registerRequest)
+
+        // Ensure context is passed to RetrofitInstance
+        RetrofitInstance.getAuthService(this).register(registerRequest)
             .enqueue(object : Callback<SignupResponse> {
                 override fun onResponse(
                     call: Call<SignupResponse>,
@@ -163,6 +165,7 @@ class SignupDriver : AppCompatActivity() {
                 }
             })
     }
+
     private fun navigateToSignup() {
         val intent = Intent(this, PriorityDriver::class.java)
         startActivity(intent)

@@ -5,14 +5,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
-import android.widget.ArrayAdapter
-import android.widget.Spinner
-import android.widget.Toast
+import android.os.Handler
+import android.os.Looper
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
+import com.example.byahemoto.models.BookingRequest
+import com.example.byahemoto.models.BookingResponse
+import com.example.byahemoto.models.DriverLocationResponse
+import com.example.byahemoto.network.RetrofitInstance
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -20,14 +22,15 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class Booking : AppCompatActivity(), OnMapReadyCallback {
 
@@ -35,76 +38,180 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val batangas = LatLng(13.7563, 121.0604)
-    private val apiKey = "AIzaSyA7TdMg8XawtIx9QX1uDGl2H_CSJU7IKpE"
-
-    private val activityMap = mapOf(
-        R.id.nav_home to UserDashboard::class.java,
-        R.id.nav_history to History::class.java,
-        R.id.nav_wallet to Wallet::class.java,
-        R.id.nav_profile to Profile::class.java
-    )
+    private lateinit var bookingButton: Button
+    private lateinit var amountTextView: TextView
+    private var vehicleType: String = ""
+    private var currentLocation: LatLng? = null
+    private var driverLocation: LatLng? = null
+    private var driverMarker: Marker? = null
+    private var bookingId: Int? = null
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_booking)
+
+        bottomNavigationView = findViewById(R.id.BottomNavigation)
+
+        vehicleType = intent.getStringExtra("vehicleType") ?: ""
+        setupUI()
+
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFrame) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        bottomNavigationView.setOnItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, UserDashboard::class.java))
+                    true
+                }
+                R.id.nav_history -> {
+                    startActivity(Intent(this, History::class.java))
+                    true
+                }
+                R.id.nav_wallet -> {
+                    startActivity(Intent(this, Wallet::class.java))
+                    true
+                }
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, Profile::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun setupUI() {
         paymentMethodSpinner = findViewById(R.id.paymentMethodSpinner)
+        amountTextView = findViewById(R.id.amount)
+        bookingButton = findViewById(R.id.bookingButton)
+
         val paymentMethods = arrayOf("CASH", "PAYPAL")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, paymentMethods)
         paymentMethodSpinner.adapter = adapter
 
+        amountTextView.text = "0.0"
 
-        bottomNavigationView = findViewById(R.id.BottomNavigation)
-        bottomNavigationView.setOnItemSelectedListener { menuItem ->
-            val activityClass = activityMap[menuItem.itemId]
-            if (activityClass != null) {
-                val intent = Intent(this, activityClass)
-                startActivity(intent)
-                true
+        bookingButton.setOnClickListener {
+            if (bookingButton.text == "CANCEL") {
+                cancelBooking()
             } else {
-                false
+                createBooking()
+                drawRoute() // Draw the route after booking is created
             }
         }
-
-        // Initialize map
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFrame) as SupportMapFragment
-        mapFragment.getMapAsync(this)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         } else {
-            // Get current location
             googleMap.isMyLocationEnabled = true
             getCurrentLocation()
-        }
-    }
 
-    private fun getCurrentLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                if (location != null) {
-                    val currentLocation = LatLng(location.latitude, location.longitude)
-                    showLocation(currentLocation)
+            googleMap.setOnMarkerClickListener { marker ->
+                if (marker != null && marker.tag == "DRIVER") {
+                    driverLocation = marker.position
+                    bookingButton.isEnabled = true // Enable the booking button when a driver is clicked
+                    Toast.makeText(this, "Driver selected", Toast.LENGTH_SHORT).show()
+                    true
                 } else {
-                    Toast.makeText(this, "Unable to get current location.", Toast.LENGTH_SHORT).show()
+                    false
                 }
             }
         }
     }
 
-    private fun showLocation(currentLocation: LatLng) {
-        googleMap.clear()
-        googleMap.addMarker(MarkerOptions().position(currentLocation).title("Current Location"))
-        googleMap.addMarker(MarkerOptions().position(batangas).title("Batangas"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 10f))
-        fetchDirections(currentLocation, batangas)
+    private fun getCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                location?.let {
+                    currentLocation = LatLng(it.latitude, it.longitude)
+                    currentLocation?.let { currentLoc ->
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc, 12f))
+                        Toast.makeText(this, "Your location fetched", Toast.LENGTH_SHORT).show()
+                    }
+                } ?: run {
+                    Toast.makeText(this, "Unable to get current location.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun createBooking() {
+        val paymentMethod = paymentMethodSpinner.selectedItem.toString()
+
+        if (currentLocation != null && driverLocation != null) {
+
+            val bookingRequest = BookingRequest(
+                paymentMethod = paymentMethod,
+                vehicleType = vehicleType,
+                locationFrom = mapOf("lat" to currentLocation!!.latitude, "lng" to currentLocation!!.longitude),
+                locationTo = mapOf("lat" to driverLocation!!.latitude, "lng" to driverLocation!!.longitude)
+            )
+
+
+            RetrofitInstance.getAuthService(this).createBooking(bookingRequest).enqueue(object : Callback<BookingResponse> {
+                override fun onResponse(call: Call<BookingResponse>, response: Response<BookingResponse>) {
+                    if (response.isSuccessful) {
+                        bookingButton.text = "CANCEL"
+                        bookingId = response.body()?.bookingId
+
+                        // Update fare in the TextView
+                        val fare = response.body()?.fare ?: 0.0 // Default to 0.0 if fare is null
+                        amountTextView.text = fare.toString()
+
+                        Toast.makeText(this@Booking, "Booking created", Toast.LENGTH_SHORT).show()
+                        startDriverLocationUpdates()
+                    } else {
+                        Toast.makeText(this@Booking, "Failed to create booking", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<BookingResponse>, t: Throwable) {
+                    Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        } else {
+            Toast.makeText(this, "Please select a driver and ensure your location is fetched", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun cancelBooking() {
+        bookingId?.let {
+            RetrofitInstance.getAuthService(this).cancelBooking(it).enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.isSuccessful) {
+                        bookingButton.text = "Confirm Booking"
+                        stopDriverLocationUpdates()
+                        Toast.makeText(this@Booking, "Booking canceled", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@Booking, "Failed to cancel booking", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+    }
+
+    private fun drawRoute() {
+        if (currentLocation != null && driverLocation != null) {
+
+            fetchDirections(currentLocation!!, driverLocation!!)
+        } else {
+            Toast.makeText(this, "Current location or driver location not available", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun fetchDirections(start: LatLng, end: LatLng) {
@@ -116,35 +223,38 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
 
         val origin = "${start.latitude},${start.longitude}"
         val destination = "${end.latitude},${end.longitude}"
+        val directionsApiKey = "AIzaSyA7TdMg8XawtIx9QX1uDGl2H_CSJU7IKpE"
 
-        service.getDirections(origin, destination, apiKey).enqueue(object : Callback<DirectionsResponse> {
-            override fun onResponse(call: Call<DirectionsResponse>, response: Response<DirectionsResponse>) {
-                if (response.isSuccessful) {
-                    val directionsResponse = response.body()
-                    if (directionsResponse != null) {
-                        val polylineOptions = PolylineOptions().color(0xFF0000FF.toInt()).width(5f)
-                        directionsResponse.routes.firstOrNull()?.legs?.firstOrNull()?.steps?.forEach { step ->
-                            val points = step.polyline.points
-                            val decodedPath = decodePolyline(points)
-                            polylineOptions.addAll(decodedPath)
+        service.getDirections(origin, destination, directionsApiKey)
+            .enqueue(object : Callback<DirectionsResponse> {
+                override fun onResponse(call: Call<DirectionsResponse>, response: Response<DirectionsResponse>) {
+                    if (response.isSuccessful) {
+                        val route = response.body()?.routes?.get(0)
+                        route?.let {
+                            val decodedPath = decodePolyline(it.legs[0].steps)
+                            googleMap.addPolyline(PolylineOptions().addAll(decodedPath))
                         }
-                        googleMap.addPolyline(polylineOptions)
                     } else {
-                        Log.d("DirectionsError", "Directions response is null.")
+                        Toast.makeText(this@Booking, "Failed to get directions", Toast.LENGTH_SHORT).show()
                     }
-                } else {
-                    Log.d("DirectionsError", "Directions API request failed with status code: ${response.code()}")
                 }
-            }
 
-            override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {
-                Log.e("DirectionsError", "Error fetching directions.", t)
-            }
-        })
+                override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {
+                    Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 
-    private fun decodePolyline(encoded: String): List<LatLng> {
-        val poly = mutableListOf<LatLng>()
+    private fun decodePolyline(steps: List<Step>): List<LatLng> {
+        val polylinePoints = mutableListOf<LatLng>()
+        for (step in steps) {
+            polylinePoints.addAll(decode(step.polyline.points))
+        }
+        return polylinePoints
+    }
+
+    private fun decode(encoded: String): List<LatLng> {
+        val poly = ArrayList<LatLng>()
         var index = 0
         val len = encoded.length
         var lat = 0
@@ -155,8 +265,8 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
             var shift = 0
             var result = 0
             do {
-                b = encoded[index++].toInt() - 63
-                result = result or ((b and 0x1f) shl shift)
+                b = encoded[index++].code - 63
+                result = result or (b and 0x1f shl shift)
                 shift += 5
             } while (b >= 0x20)
             val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
@@ -165,20 +275,67 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
             shift = 0
             result = 0
             do {
-                b = encoded[index++].toInt() - 63
-                result = result or ((b and 0x1f) shl shift)
+                b = encoded[index++].code - 63
+                result = result or (b and 0x1f shl shift)
                 shift += 5
             } while (b >= 0x20)
             val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
             lng += dlng
 
             val p = LatLng(
-                (lat / 1E5).toDouble(),
-                (lng / 1E5).toDouble()
+                lat / 1E5,
+                lng / 1E5
             )
             poly.add(p)
         }
-
         return poly
+    }
+
+    private fun startDriverLocationUpdates() {
+        handler.postDelayed(object : Runnable {
+            override fun run() {
+                bookingId?.let { id ->
+                    RetrofitInstance.getAuthService(this@Booking).getDriverLocationUpdates(id).enqueue(object : Callback<DriverLocationResponse> {
+                        override fun onResponse(call: Call<DriverLocationResponse>, response: Response<DriverLocationResponse>) {
+                            if (response.isSuccessful) {
+                                val locationResponse = response.body()
+                                locationResponse?.let {
+                                    updateDriverLocationOnMap(LatLng(it.lat, it.lng))
+                                }
+                            } else {
+                                Toast.makeText(this@Booking, "Failed to get driver location", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<DriverLocationResponse>, t: Throwable) {
+                            Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+                }
+                handler.postDelayed(this, 5000) // Update every 5 seconds
+            }
+        }, 5000)
+    }
+
+    private fun stopDriverLocationUpdates() {
+        handler.removeCallbacksAndMessages(null)
+    }
+
+    private fun updateDriverLocationOnMap(driverLocation: LatLng) {
+        if (driverMarker == null) {
+            driverMarker = googleMap.addMarker(MarkerOptions().position(driverLocation).title("Driver"))
+        } else {
+            driverMarker?.position = driverLocation
+        }
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(driverLocation, 15f))
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            getCurrentLocation()
+        } else {
+            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+        }
     }
 }

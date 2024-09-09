@@ -72,7 +72,7 @@ class DriverLogin : AppCompatActivity() {
         val logger = HttpLoggingInterceptor()
         logger.setLevel(HttpLoggingInterceptor.Level.BODY)
 
-        RetrofitInstance.authService.login(username.toRequestBody(), password.toRequestBody())
+        RetrofitInstance.getAuthService(this).login(username.toRequestBody(), password.toRequestBody())
             .enqueue(object : Callback<LoginResponse> {
                 override fun onResponse(
                     call: Call<LoginResponse>,
@@ -116,18 +116,19 @@ class DriverLogin : AppCompatActivity() {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
             putString("access_token", loginResponse.access_token)
+            putString("refresh_token", loginResponse.refresh_token)
+            putInt("user_id", loginResponse.user.id)
             putString("username", loginResponse.user.username)
             putString("email", loginResponse.user.email)
             putString("phone_number", loginResponse.user.phone_number)
             putString(
                 "registration_type",
                 loginResponse.user.registration_type
-            ) // Save registrationType
+            )
             apply()
         }
         saveTokenToPreferences(loginResponse.access_token)
     }
-
 
     private fun saveCredentials(username: String, password: String) {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
@@ -156,12 +157,7 @@ class DriverLogin : AppCompatActivity() {
     private fun clearSavedCredentials() {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
-            remove("username")
-            remove("password")
-            remove("access_token")
-            remove("email")
-            remove("phone_number")
-            remove("registrationType")
+            clear()
             apply()
         }
     }
@@ -171,7 +167,6 @@ class DriverLogin : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
 
     private fun handleLoginError(errorBody: ResponseBody?) {
         errorBody?.let {

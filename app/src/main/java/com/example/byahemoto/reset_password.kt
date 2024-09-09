@@ -39,7 +39,7 @@ class reset_password : AppCompatActivity() {
             } else {
                 val token = intent.getStringExtra("token")
                 if (token != null) {
-                    resetPassword(token, newPassword, confirmPassword)
+                    resetPassword(token, newPassword)
                 } else {
                     Toast.makeText(this, "Token is missing or invalid", Toast.LENGTH_SHORT).show()
                 }
@@ -47,10 +47,10 @@ class reset_password : AppCompatActivity() {
         }
     }
 
-    private fun resetPassword(token: String, password: String, confirmPassword: String) {
-        val resetPasswordRequest = ResetPasswordRequest(token, password, confirmPassword)
+    private fun resetPassword(token: String, password: String) {
+        val resetPasswordRequest = ResetPasswordRequest(token, password, password)
 
-        RetrofitInstance.authService.resetPassword(resetPasswordRequest).enqueue(object : Callback<Void> {
+        RetrofitInstance.getAuthService(this).resetPassword(resetPasswordRequest).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@reset_password, "Password reset successful", Toast.LENGTH_SHORT).show()
@@ -69,6 +69,7 @@ class reset_password : AppCompatActivity() {
     }
 
     private fun isPasswordValid(password: String): Boolean {
+        // Ensure password has at least one number, one special character, and is at least 8 characters long
         val passwordPattern = Regex("^(?=.*[0-9])(?=.*[!@#\$%^&*]).{8,}$")
         return passwordPattern.matches(password)
     }

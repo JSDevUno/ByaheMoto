@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -25,7 +24,6 @@ import com.example.byahemoto.network.RetrofitInstance
 import com.example.byahemoto.utils.Constants
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -66,8 +64,7 @@ class EditProfile : AppCompatActivity() {
     }
 
     private fun checkStoragePermission(): Boolean {
-        val result =
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        val result = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
         return result == PackageManager.PERMISSION_GRANTED
     }
 
@@ -86,62 +83,55 @@ class EditProfile : AppCompatActivity() {
 
     private fun saveProfileChanges() {
         val token = getTokenFromPreferences()
-        Log.d("AuthToken", "Token: $token")
-
         val phoneNumber = phoneNumberEditText.text.toString().trim()
 
-
-        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        with(sharedPref.edit()) {
-            putString("phone_number", phoneNumber)
-            apply()
-        }
-
-
-        if (selectedImageFile != null) uploadProfilePicture(token, selectedImageFile!!)
-
-
         if (phoneNumber.isEmpty()) {
-            finish()
+            Toast.makeText(this, "Phone number cannot be empty", Toast.LENGTH_SHORT).show()
             return
         }
 
         val profileUpdate = ProfileUpdate(phoneNumber = phoneNumber)
 
-        RetrofitInstance.authService.updateProfile(token, profileUpdate)
+        // Update phone number
+        RetrofitInstance.getAuthService(this).updateProfile(token, profileUpdate)
             .enqueue(object : Callback<ProfileUpdateResponse> {
                 override fun onResponse(
                     call: Call<ProfileUpdateResponse>,
                     response: Response<ProfileUpdateResponse>
                 ) {
                     if (response.isSuccessful) {
+                        // Save updated phone number in SharedPreferences
+                        val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+                        with(sharedPref.edit()) {
+                            putString("phone_number", phoneNumber)
+                            apply()
+                        }
+
                         Toast.makeText(
                             this@EditProfile,
                             "Profile updated successfully",
                             Toast.LENGTH_SHORT
                         ).show()
-                        Log.d(TAG, "Profile update response: ${response.body()}")
-                        finish() // Go back to profile page after saving changes
+
+                        // Return success result
+                        setResult(RESULT_OK)
+                        finish()
                     } else {
-                        val errorBody = response.errorBody()?.string() ?: "Unknown error"
                         Toast.makeText(
                             this@EditProfile,
-                            "Failed to update profile: $errorBody",
+                            "Failed to update profile: ${response.errorBody()?.string()}",
                             Toast.LENGTH_SHORT
                         ).show()
-                        Log.e(TAG, "Profile update failed: $errorBody")
                     }
                 }
 
                 override fun onFailure(call: Call<ProfileUpdateResponse>, t: Throwable) {
-                    Toast.makeText(
-                        this@EditProfile,
-                        "An error occurred: ${t.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    Log.e(TAG, "Profile update error: ${t.message}", t)
+                    Toast.makeText(this@EditProfile, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
+
+        // Upload profile picture if a new image was selected
+        selectedImageFile?.let { uploadProfilePicture(token, it) }
     }
 
     private fun loadCurrentProfileData() {
@@ -183,11 +173,12 @@ class EditProfile : AppCompatActivity() {
     private fun getRealPathFromURI(uri: Uri): String? {
         var result: String? = null
         val cursor = contentResolver.query(uri, null, null, null, null)
-        if (cursor != null) {
-            cursor.moveToFirst()
-            val idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
-            result = cursor.getString(idx)
-            cursor.close()
+        cursor?.let {
+            if (it.moveToFirst()) {
+                val idx = it.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+                result = it.getString(idx)
+            }
+            it.close()
         }
         return result
     }
@@ -196,19 +187,19 @@ class EditProfile : AppCompatActivity() {
         val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("profilePicture", file.name, requestFile)
 
-        RetrofitInstance.authService.updateProfilePicture(token, body)
+        // API call to upload the profile picture with the correct token
+        RetrofitInstance.getAuthService(this).updateProfilePicture(token, body)
             .enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
                         selectedImageFile = null
-
-                        val phoneNumber = phoneNumberEditText.text.toString().trim()
-
-                        if (phoneNumber.isEmpty()) {
-                            finish()
-                            return
-                        }
+                        Toast.makeText(
+                            this@EditProfile,
+                            "Profile picture updated successfully",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         saveProfileChanges()
+                        loadCurrentProfileData()
                     } else {
                         val errorBody = response.errorBody()?.string() ?: "Unknown error"
                         Toast.makeText(
@@ -231,9 +222,7 @@ class EditProfile : AppCompatActivity() {
 
     private fun getTokenFromPreferences(): String {
         val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
-        val token = sharedPref.getString("access_token", "") ?: ""
-        Log.d("AuthToken", "Retrieved token: $token")
-        return "Bearer $token"
+        return "Bearer ${sharedPref.getString("access_token", "") ?: ""}"
     }
 
     override fun onRequestPermissionsResult(
@@ -242,16 +231,14 @@ class EditProfile : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openFileManager()
-            } else {
-                Toast.makeText(
-                    this,
-                    "Storage permission is required to select a profile picture",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            openFileManager()
+        } else {
+            Toast.makeText(
+                this,
+                "Storage permission is required to select a profile picture",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 }

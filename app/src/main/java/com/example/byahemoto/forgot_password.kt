@@ -13,12 +13,15 @@ import retrofit2.Response
 
 class forgot_password : AppCompatActivity() {
 
+    private lateinit var emailEditText: EditText
+    private lateinit var sendResetLinkButton: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
 
-        val emailEditText = findViewById<EditText>(R.id.etEmail)
-        val sendResetLinkButton = findViewById<Button>(R.id.btnSendResetLink)
+        emailEditText = findViewById(R.id.etEmail)
+        sendResetLinkButton = findViewById(R.id.btnSendResetLink)
 
         sendResetLinkButton.setOnClickListener {
             val email = emailEditText.text.toString().trim()
@@ -33,7 +36,7 @@ class forgot_password : AppCompatActivity() {
     private fun sendResetLink(email: String) {
         val emailMap = mapOf("email" to email)
 
-        RetrofitInstance.authService.sendResetLink(emailMap).enqueue(object : Callback<Void> {
+        RetrofitInstance.getAuthService(this).sendResetLink(emailMap).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@forgot_password, "Reset link sent to $email", Toast.LENGTH_SHORT).show()
@@ -58,5 +61,4 @@ class forgot_password : AppCompatActivity() {
             }
         })
     }
-
 }

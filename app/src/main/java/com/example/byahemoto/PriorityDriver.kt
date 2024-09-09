@@ -1,6 +1,7 @@
 package com.example.byahemoto
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -52,8 +53,7 @@ class PriorityDriver : AppCompatActivity() {
         confirmPasswordEditText = findViewById(R.id.passwordEditText2Driver)
         userTypeSpinner = findViewById(R.id.userTypeSpinnerDriver)
 
-        val userTypeOptions =
-            arrayOf("Driver")
+        val userTypeOptions = arrayOf("Driver")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, userTypeOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         userTypeSpinner.adapter = adapter
@@ -112,7 +112,8 @@ class PriorityDriver : AppCompatActivity() {
 
             Log.d("Signup", "File Part: $filePart")
 
-            RetrofitInstance.authService.register(registerRequest)
+            // Retrieve token and pass it with requests
+            RetrofitInstance.getAuthService(this).register(registerRequest)
                 .enqueue(object : Callback<SignupResponse> {
                     override fun onResponse(
                         call: Call<SignupResponse>,
@@ -148,7 +149,8 @@ class PriorityDriver : AppCompatActivity() {
 
                         val identityType = userType.uppercase().toRequestBody(MultipartBody.FORM)
 
-                        RetrofitInstance.authService.sendVerificationRequest(
+                        // Send the verification request with token
+                        RetrofitInstance.getAuthService(this@PriorityDriver).sendVerificationRequest(
                             filePart,
                             userId.toRequestBody(MultipartBody.FORM),
                             identityType
@@ -229,5 +231,4 @@ class PriorityDriver : AppCompatActivity() {
         }
         return file
     }
-
 }
