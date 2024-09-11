@@ -1,5 +1,6 @@
 package com.example.byahemoto.network
 
+import com.example.byahemoto.models.AvailableBooking
 import com.example.byahemoto.models.BookingRequest
 import com.example.byahemoto.models.BookingResponse
 import com.example.byahemoto.models.DriverLocationResponse
@@ -82,6 +83,12 @@ interface AuthService {
 
     //Booking-related endpoints
 
+    // Get available bookings
+    @GET("/bookings/")
+    fun getAvailableBookings(
+        @Header("Available Booking") token: String
+    ): Call<List<AvailableBooking>>
+
     // Create a new booking
     @POST("/bookings/")
     fun createBooking(@Body bookingRequest: BookingRequest): Call<BookingResponse>
@@ -123,4 +130,5 @@ interface AuthService {
         @Header("Authorization") token: String,
         @Path("order_id") orderId: String
     ): Call<Void>
+
 }
