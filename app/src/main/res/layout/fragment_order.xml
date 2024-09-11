@@ -13,15 +13,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="visible">
 
 
         </LinearLayout>
     </ScrollView>
 
     <include
-        layout="@layout/layout_panels"
         android:id="@+id/cardViewContainer"
+        layout="@layout/layout_panels"
         android:visibility="visible" />
 
 </FrameLayout>
