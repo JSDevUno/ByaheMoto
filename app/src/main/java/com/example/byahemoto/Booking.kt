@@ -135,6 +135,7 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
                     currentLocation = LatLng(it.latitude, it.longitude)
                     currentLocation?.let { currentLoc ->
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc, 12f))
+                        googleMap.addMarker(MarkerOptions().position(currentLoc).title("You"))?.tag = "USER"
                         Toast.makeText(this, "Your location fetched", Toast.LENGTH_SHORT).show()
                     }
                 } ?: run {
@@ -149,7 +150,7 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
     private fun createBooking() {
         val paymentMethod = paymentMethodSpinner.selectedItem.toString()
 
-        if (currentLocation != null && driverLocation != null) {
+//        if (currentLocation != null && driverLocation != null) {
 
             val bookingRequest = BookingRequest(
                 paymentMethod = paymentMethod,
@@ -180,9 +181,9 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
                     Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
-        } else {
-            Toast.makeText(this, "Please select a driver and ensure your location is fetched", Toast.LENGTH_SHORT).show()
-        }
+//        } else {
+//            Toast.makeText(this, "Please select a driver and ensure your location is fetched", Toast.LENGTH_SHORT).show()
+//        }
     }
 
     private fun cancelBooking() {
@@ -206,12 +207,12 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun drawRoute() {
-        if (currentLocation != null && driverLocation != null) {
+//        if (currentLocation != null && driverLocation != null) {
 
             fetchDirections(currentLocation!!, driverLocation!!)
-        } else {
-            Toast.makeText(this, "Current location or driver location not available", Toast.LENGTH_SHORT).show()
-        }
+//        } else {
+//            Toast.makeText(this, "Current location or driver location not available", Toast.LENGTH_SHORT).show()
+//        }
     }
 
     private fun fetchDirections(start: LatLng, end: LatLng) {
