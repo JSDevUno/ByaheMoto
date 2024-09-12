@@ -111,7 +111,7 @@ interface AuthService {
     fun getRideHistory(
         @Header("Authorization") token: String
     ): Call<RideHistoryResponse>
-
+    
     @GET("/profile/history/transaction")
     fun getTransactionHistory(
         @Header("Authorization") token: String

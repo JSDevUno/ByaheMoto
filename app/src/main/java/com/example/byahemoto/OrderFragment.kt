@@ -1,5 +1,8 @@
 package com.example.byahemoto
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -7,9 +10,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.byahemoto.models.AvailableBooking
 import com.example.byahemoto.models.BookingResponse
+import com.example.byahemoto.models.DriverLocationResponse
 import com.example.byahemoto.network.AuthService
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -20,7 +31,6 @@ import java.security.cert.CertPathValidatorException.BasicReason
 
 
 class OrderFragment : Fragment() {
-
     private val BASE_URL = "https://fond-beagle-prime.ngrok-free.app"
 
     override fun onCreateView(
@@ -28,38 +38,22 @@ class OrderFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        getTokenForCurrentUser()
         listAvailableBookings()
-        return inflater.inflate(R.layout.fragment_order, container, false)
+
+        return inflater.inflate(R.layout.fragment_order, container
+            , false)
+
     }
+
+    private fun getTokenForCurrentUser(): String {
+        val sharedPref = activity?.getSharedPreferences("user_prefs", MODE_PRIVATE)
+        return sharedPref?.getString("access_token", "") ?: ""
+    }
+
     private fun listAvailableBookings(){
     // Add new booking to the list
-    val api = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(AuthService::class.java)
-    val sampleToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkcmF5YmFoQGdtYWlsLmNvbSIsImp0aSI6MTUsImZ1bGxfbmFtZSI6ImRyYXliYWgiLCJ1c2VybmFtZSI6ImRyYXliYWgiLCJyb2xlIjoiRFJJVkVSIiwiaXNfdmVyaWZpZWQiOmZhbHNlLCJleHAiOjE3MjYwNTM2ODZ9.2KilgKprhRBQ6k8X3IeMEmvYCJLTEv9OiAfGuhZjFsY"
 
-        api.getAvailableBookings(sampleToken).enqueue(object : Callback<List<AvailableBooking>> {
-        override fun onResponse(
-            call: Call<List<AvailableBooking>>,
-            response: Response<List<AvailableBooking>>
-        ) {
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    for (booking in it) {
-                        Log.d("AvailableBookingSuccess", booking.toString())
-                    }
-                }
-            } else {
-                Log.d("AvailableBookingError", response.errorBody().toString())
-            }
-        }
-
-        override fun onFailure(call: Call<List<AvailableBooking>>, t: Throwable) {
-            Log.d("AvailableBookingFailure", t.message.toString())
-        }
-    })
 
     }//END
 }
