@@ -98,6 +98,12 @@ interface AuthService {
         @Path("booking_id") bookingId: Int
     ): Call<DriverLocationResponse>
 
+    //Booking Details
+    @GET("/bookings/{booking_id}")
+    fun getBookingDetails(
+        @Path("booking_id") bookingId: Int
+    ): Call<BookingResponse>
+
     //Ride History
 
     @GET("/profile/history/ride")

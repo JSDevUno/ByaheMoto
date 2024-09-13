@@ -7,6 +7,7 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -14,6 +15,8 @@ import androidx.core.content.ContextCompat
 import com.example.byahemoto.models.BookingRequest
 import com.example.byahemoto.models.BookingResponse
 import com.example.byahemoto.models.DriverLocationResponse
+import com.example.byahemoto.models.LocData
+import com.example.byahemoto.models.LocationData
 import com.example.byahemoto.network.RetrofitInstance
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -26,6 +29,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -40,6 +44,7 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var bookingButton: Button
     private lateinit var amountTextView: TextView
+    private lateinit var statusPanel: TextView
     private var vehicleType: String = ""
     private var currentLocation: LatLng? = null
     private var driverLocation: LatLng? = null
@@ -52,6 +57,10 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_booking)
 
         bottomNavigationView = findViewById(R.id.BottomNavigation)
+        paymentMethodSpinner = findViewById(R.id.paymentMethodSpinner)
+        amountTextView = findViewById(R.id.amount)
+        statusPanel = findViewById(R.id.statusPanel)
+        bookingButton = findViewById(R.id.bookingButton)
 
         vehicleType = intent.getStringExtra("vehicleType") ?: ""
         setupUI()
@@ -84,10 +93,6 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setupUI() {
-        paymentMethodSpinner = findViewById(R.id.paymentMethodSpinner)
-        amountTextView = findViewById(R.id.amount)
-        bookingButton = findViewById(R.id.bookingButton)
-
         val paymentMethods = arrayOf("CASH", "PAYPAL")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, paymentMethods)
         paymentMethodSpinner.adapter = adapter
@@ -95,12 +100,7 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
         amountTextView.text = "0.0"
 
         bookingButton.setOnClickListener {
-            if (bookingButton.text == "CANCEL") {
-                cancelBooking()
-            } else {
-                createBooking()
-                drawRoute() // Draw the route after booking is created
-            }
+            createBooking()
         }
     }
 
@@ -111,32 +111,16 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
         } else {
             googleMap.isMyLocationEnabled = true
             getCurrentLocation()
-
-            googleMap.setOnMarkerClickListener { marker ->
-                if (marker != null && marker.tag == "DRIVER") {
-                    driverLocation = marker.position
-                    bookingButton.isEnabled = true // Enable the booking button when a driver is clicked
-                    Toast.makeText(this, "Driver selected", Toast.LENGTH_SHORT).show()
-                    true
-                } else {
-                    false
-                }
-            }
         }
     }
 
     private fun getCurrentLocation() {
-        if (ActivityCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 location?.let {
                     currentLocation = LatLng(it.latitude, it.longitude)
-                    currentLocation?.let { currentLoc ->
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc, 12f))
-                        Toast.makeText(this, "Your location fetched", Toast.LENGTH_SHORT).show()
-                    }
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation!!, 12f))
+                    Toast.makeText(this, "Your location fetched", Toast.LENGTH_SHORT).show()
                 } ?: run {
                     Toast.makeText(this, "Unable to get current location.", Toast.LENGTH_SHORT).show()
                 }
@@ -148,66 +132,145 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
 
     private fun createBooking() {
         val paymentMethod = paymentMethodSpinner.selectedItem.toString()
+        val locationToText = findViewById<EditText>(R.id.locationToTxt).text.toString()
 
-        if (currentLocation != null && driverLocation != null) {
+        if (locationToText.isEmpty()) {
+            Toast.makeText(this, "Please enter a drop-off location", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-            val bookingRequest = BookingRequest(
-                paymentMethod = paymentMethod,
-                vehicleType = vehicleType,
-                locationFrom = mapOf("lat" to currentLocation!!.latitude, "lng" to currentLocation!!.longitude),
-                locationTo = mapOf("lat" to driverLocation!!.latitude, "lng" to driverLocation!!.longitude)
-            )
+        currentLocation?.let { currentLoc ->
 
+            // Log the current location
+            Log.d("CreateBooking", "Current location: $currentLoc")
 
-            RetrofitInstance.getAuthService(this).createBooking(bookingRequest).enqueue(object : Callback<BookingResponse> {
-                override fun onResponse(call: Call<BookingResponse>, response: Response<BookingResponse>) {
-                    if (response.isSuccessful) {
-                        bookingButton.text = "CANCEL"
-                        bookingId = response.body()?.bookingId
+            geocodeLocation(locationToText) { locationToLatLng ->
+                if (locationToLatLng != null) {
 
-                        // Update fare in the TextView
-                        val fare = response.body()?.fare ?: 0.0 // Default to 0.0 if fare is null
-                        amountTextView.text = fare.toString()
+                    // Log the geocoded location
+                    Log.d("CreateBooking", "Geocoded location: $locationToLatLng")
 
-                        Toast.makeText(this@Booking, "Booking created", Toast.LENGTH_SHORT).show()
-                        startDriverLocationUpdates()
-                    } else {
-                        Toast.makeText(this@Booking, "Failed to create booking", Toast.LENGTH_SHORT).show()
-                    }
+                    val bookingRequest = BookingRequest(
+                        paymentMethod = paymentMethod,
+                        vehicleType = vehicleType,
+                        locationFrom = LocData(currentLoc.latitude, currentLoc.longitude),
+                        locationTo = LocData(locationToLatLng.latitude, locationToLatLng.longitude)
+                    )
+
+                    // Log the booking request
+                    Log.d("BookingRequest", Gson().toJson(bookingRequest))
+
+                    RetrofitInstance.getAuthService(this).createBooking(bookingRequest).enqueue(object : Callback<BookingResponse> {
+                        override fun onResponse(call: Call<BookingResponse>, response: Response<BookingResponse>) {
+                            if (response.isSuccessful) {
+                                val bookingResponse = response.body()
+                                bookingResponse?.let {
+                                    // Log the booking response
+                                    Log.d("BookingResponse", Gson().toJson(it))
+
+                                    bookingId = it.bookingId
+                                    bookingButton.text = "Booking in progress..."
+                                    bookingButton.isEnabled = false
+
+                                    val fare = it.fare
+                                    amountTextView.text = fare.toString()
+
+                                    trackBookingStatus()
+                                    startDriverLocationUpdates()
+                                } ?: run {
+                                    Toast.makeText(this@Booking, "Empty booking response", Toast.LENGTH_SHORT).show()
+                                    Log.e("BookingResponse", "Response body is null")
+                                }
+                            } else {
+                                Toast.makeText(this@Booking, "Failed to create booking", Toast.LENGTH_SHORT).show()
+                                Log.e("BookingResponse", "Error: ${response.errorBody()?.string()}")
+                            }
+                        }
+
+                        override fun onFailure(call: Call<BookingResponse>, t: Throwable) {
+                            Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                            Log.e("BookingResponse", "Failure: ${t.message}", t)
+                        }
+                    })
+                } else {
+                    Toast.makeText(this, "Failed to get coordinates for the drop-off location", Toast.LENGTH_SHORT).show()
+                    Log.e("CreateBooking", "Geocoding failed for location: $locationToText")
                 }
-
-                override fun onFailure(call: Call<BookingResponse>, t: Throwable) {
-                    Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                }
-            })
-        } else {
-            Toast.makeText(this, "Please select a driver and ensure your location is fetched", Toast.LENGTH_SHORT).show()
+            }
+        } ?: run {
+            Toast.makeText(this, "Current location not available", Toast.LENGTH_SHORT).show()
+            Log.e("CreateBooking", "Current location is null")
         }
     }
 
-    private fun cancelBooking() {
-        bookingId?.let {
-            RetrofitInstance.getAuthService(this).cancelBooking(it).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    if (response.isSuccessful) {
-                        bookingButton.text = "Confirm Booking"
-                        stopDriverLocationUpdates()
-                        Toast.makeText(this@Booking, "Booking canceled", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this@Booking, "Failed to cancel booking", Toast.LENGTH_SHORT).show()
-                    }
-                }
+    private fun geocodeLocation(address: String, callback: (LatLng?) -> Unit) {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://maps.googleapis.com/maps/api/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+        val service = retrofit.create(GeocodingApiService::class.java)
+        val apiKey = "AIzaSyA7TdMg8XawtIx9QX1uDGl2H_CSJU7IKpE"
+
+        service.getCoordinates(address, apiKey).enqueue(object : Callback<GeocodingResponse> {
+            override fun onResponse(call: Call<GeocodingResponse>, response: Response<GeocodingResponse>) {
+                if (response.isSuccessful && response.body()?.results?.isNotEmpty() == true) {
+                    val location = response.body()!!.results[0].geometry.location
+                    callback(LatLng(location.lat, location.lng))
+                } else {
+                    callback(null)
                 }
-            })
-        }
+            }
+
+            override fun onFailure(call: Call<GeocodingResponse>, t: Throwable) {
+                Toast.makeText(this@Booking, "Geocoding failed: ${t.message}", Toast.LENGTH_SHORT).show()
+                callback(null)
+            }
+        })
     }
+
+
+
+
+    private fun trackBookingStatus() {
+        handler.postDelayed(object : Runnable {
+            override fun run() {
+                bookingId?.let { id ->
+                    RetrofitInstance.getAuthService(this@Booking).getBookingDetails(id).enqueue(object : Callback<BookingResponse> {
+                        override fun onResponse(call: Call<BookingResponse>, response: Response<BookingResponse>) {
+                            if (response.isSuccessful) {
+                                val status = response.body()?.status
+                                statusPanel.text = status ?: "Unknown"
+
+                                // Check if the driver has accepted the booking
+                                if (status == "Accepted" || status == "Picked Up") {
+                                    // Update the fare when the driver accepts the booking
+                                    val fare = response.body()?.fare ?: 0.0
+                                    amountTextView.text = fare.toString()
+                                }
+
+                                // Stop polling if the booking is either completed or cancelled
+                                if (status == "Dropped" || status == "Cancelled") {
+                                    handler.removeCallbacksAndMessages(null)
+                                }
+                            } else {
+                                Toast.makeText(this@Booking, "Failed to track booking status", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<BookingResponse>, t: Throwable) {
+                            Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+                }
+                handler.postDelayed(this, 5000)  // Polling every 5 seconds
+            }
+        }, 5000)
+    }
+
 
     private fun drawRoute() {
         if (currentLocation != null && driverLocation != null) {
-
             fetchDirections(currentLocation!!, driverLocation!!)
         } else {
             Toast.makeText(this, "Current location or driver location not available", Toast.LENGTH_SHORT).show()
@@ -225,24 +288,23 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
         val destination = "${end.latitude},${end.longitude}"
         val directionsApiKey = "AIzaSyA7TdMg8XawtIx9QX1uDGl2H_CSJU7IKpE"
 
-        service.getDirections(origin, destination, directionsApiKey)
-            .enqueue(object : Callback<DirectionsResponse> {
-                override fun onResponse(call: Call<DirectionsResponse>, response: Response<DirectionsResponse>) {
-                    if (response.isSuccessful) {
-                        val route = response.body()?.routes?.get(0)
-                        route?.let {
-                            val decodedPath = decodePolyline(it.legs[0].steps)
-                            googleMap.addPolyline(PolylineOptions().addAll(decodedPath))
-                        }
-                    } else {
-                        Toast.makeText(this@Booking, "Failed to get directions", Toast.LENGTH_SHORT).show()
+        service.getDirections(origin, destination, directionsApiKey).enqueue(object : Callback<DirectionsResponse> {
+            override fun onResponse(call: Call<DirectionsResponse>, response: Response<DirectionsResponse>) {
+                if (response.isSuccessful) {
+                    val route = response.body()?.routes?.get(0)
+                    route?.let {
+                        val decodedPath = decodePolyline(it.legs[0].steps)
+                        googleMap.addPolyline(PolylineOptions().addAll(decodedPath))
                     }
+                } else {
+                    Toast.makeText(this@Booking, "Failed to get directions", Toast.LENGTH_SHORT).show()
                 }
+            }
 
-                override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {
-                    Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                }
-            })
+            override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {
+                Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun decodePolyline(steps: List<Step>): List<LatLng> {
@@ -282,10 +344,7 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
             val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
             lng += dlng
 
-            val p = LatLng(
-                lat / 1E5,
-                lng / 1E5
-            )
+            val p = LatLng(lat / 1E5, lng / 1E5)
             poly.add(p)
         }
         return poly
@@ -300,7 +359,9 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
                             if (response.isSuccessful) {
                                 val locationResponse = response.body()
                                 locationResponse?.let {
-                                    updateDriverLocationOnMap(LatLng(it.lat, it.lng))
+                                    driverLocation = LatLng(it.lat, it.lng)
+                                    updateDriverLocationOnMap(driverLocation!!)
+                                    drawRoute()
                                 }
                             } else {
                                 Toast.makeText(this@Booking, "Failed to get driver location", Toast.LENGTH_SHORT).show()
@@ -312,13 +373,9 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
                         }
                     })
                 }
-                handler.postDelayed(this, 5000) // Update every 5 seconds
+                handler.postDelayed(this, 5000)  // Update every 5 seconds
             }
         }, 5000)
-    }
-
-    private fun stopDriverLocationUpdates() {
-        handler.removeCallbacksAndMessages(null)
     }
 
     private fun updateDriverLocationOnMap(driverLocation: LatLng) {
