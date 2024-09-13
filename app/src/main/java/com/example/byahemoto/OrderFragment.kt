@@ -58,8 +58,16 @@ class OrderFragment : Fragment() {
                     for (booking in bookings) {
                         Toast.makeText(context, "Bookings Fetched!", Toast.LENGTH_SHORT).show()
                         Log.d("AvailableBooking", booking.toString())
-                        response.body()?.forEach {
-                            Log.d("AvailableBooking", it.toString())
+
+                        response.body()?.forEach { bookingDetails ->
+                            // Test kung idi-display yung mga details ng booking
+                            Log.d("Booking Details", "Vehicle Type: ${bookingDetails.vehicleType}, " +
+                                    "Fare: ${bookingDetails.fare}, " +
+                                    "Status: ${bookingDetails.status}, " +
+                                    "Location From: ${bookingDetails.locationFrom.lat}, ${bookingDetails.locationFrom.lng}, " +
+                                    "Location To: ${bookingDetails.locationTo.lat}, ${bookingDetails.locationTo.lng}, " +
+                                    "Mode of Payment: ${bookingDetails.modeOfPayment}, " +
+                                    "User ID: ${bookingDetails.userId}")
                         }
                     }
                 }
