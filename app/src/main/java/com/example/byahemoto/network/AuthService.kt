@@ -86,7 +86,7 @@ interface AuthService {
     // Get available bookings
     @GET("/bookings/")
     fun getAvailableBookings(
-        @Header("Available Booking") token: String
+        @Header("Available-Booking") token: String
     ): Call<List<AvailableBooking>>
 
     // Create a new booking
