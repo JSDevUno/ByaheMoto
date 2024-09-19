@@ -207,12 +207,12 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun drawRoute() {
-//        if (currentLocation != null && driverLocation != null) {
+        if (currentLocation != null && driverLocation != null) {
 
             fetchDirections(currentLocation!!, driverLocation!!)
-//        } else {
-//            Toast.makeText(this, "Current location or driver location not available", Toast.LENGTH_SHORT).show()
-//        }
+        } else {
+            Toast.makeText(this, "Current location or driver location not available", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun fetchDirections(start: LatLng, end: LatLng) {

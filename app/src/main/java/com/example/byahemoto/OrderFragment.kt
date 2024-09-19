@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import com.example.byahemoto.models.AvailableBooking
 import com.example.byahemoto.network.AuthService
+import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import kotlinx.coroutines.CoroutineScope
@@ -33,8 +34,9 @@ class OrderFragment : Fragment() {
         // Inflate the layout for this fragment
         listAvailableBookings()
 
-        return inflater.inflate(R.layout.fragment_order, container
-            , false)
+        return inflater.inflate(
+            R.layout.fragment_order, container, false
+        )
 
     }
 
@@ -43,7 +45,7 @@ class OrderFragment : Fragment() {
         return "Bearer ${sharedPref?.getString("access_token", "") ?: ""}"
     }
 
-    private fun makeRequest(url : String) {
+    private fun makeRequest(url: String) {
         val client = OkHttpClient()
         val token = getTokenFromPreferences()
 
@@ -95,9 +97,8 @@ class OrderFragment : Fragment() {
         }
     }
 
-    private fun listAvailableBookings(){
-    // Add new booking to the list
-        refreshToken(BASE_URL)
+    private fun listAvailableBookings() {
+        // Add new booking to the list
         makeRequest(BASE_URL)
 
         val token = getTokenFromPreferences()
@@ -109,40 +110,38 @@ class OrderFragment : Fragment() {
 
         val service = retrofit.create(AuthService::class.java)
 
-        service.getAvailableBookings(token).enqueue(object : Callback<List<AvailableBooking>> {
+        service.getAvailableBookings(token).enqueue(object : Callback<AvailableBooking> {
+
             override fun onResponse(
-                call: Call<List<AvailableBooking>>,
-                response: Response<List<AvailableBooking>>
+                call: Call<AvailableBooking>,
+                response: Response<AvailableBooking>
             ) {
-                if (response.isSuccessful) {
-                    val bookings = response.body()
+                val responseBody = response.body()?.toString()
+                Log.i("Response Body", responseBody ?: "Empty response body")
 
-                    if (bookings != null) {
-                        for (booking in bookings) {
-                            Toast.makeText(context, "Bookings Fetched!", Toast.LENGTH_SHORT).show()
-                            Log.d("Bookings Fetched", booking.toString())
-
-                            // Assuming booking is an object with properties you want to display
-                            Log.d("Booking Details", "Vehicle Type: ${booking.vehicleType}, " +
-                                    "Fare: ${booking.fare}, " +
-                                    "Status: ${booking.status}, " +
-                                    "Location From: ${booking.locationFrom.lat}, ${booking.locationFrom.lng}, " +
-                                    "Location To: ${booking.locationTo.lat}, ${booking.locationTo.lng}, " +
-                                    "Mode of Payment: ${booking.modeOfPayment}, " +
-                                    "User ID: ${booking.userId}")
-                        }
-                    }
-                } else {
-                    Toast.makeText(context, "Booking not fetched!", Toast.LENGTH_SHORT).show()
-                    Log.e("Booking not fetched", response.errorBody()?.string() ?: "Unknown error")
-                }
+//                // Parse the JSON response
+//                val gson = Gson()
+//                val apiResponse = gson.fromJson(responseBody, AvailableBooking::class.java)
+//
+//                // Retrieve values from the data array
+//                val bookings = apiResponse.data
+//                for (booking in bookings) {
+//                    println("Vehicle Type: ${booking.vehicleType}")
+//                    println("Fare: ${booking.fare}")
+//                    println("Status: ${booking.status}")
+//                    println("Location From: ${booking.locationFrom.lat}, ${booking.locationFrom.lng}")
+//                    println("Location To: ${booking.locationTo.lat}, ${booking.locationTo.lng}")
+//                    println("Mode of Payment: ${booking.modeOfPayment}")
+//                    println("User ID: ${booking.userId}")
+//                }
             }
 
-        override fun onFailure(call: Call<List<AvailableBooking>>, t: Throwable) {
-            Toast.makeText(context, "Error Fetching Book!", Toast.LENGTH_SHORT).show()
-            Log.e("Error Fetching Book", t.message.toString())
-        }
-    })
-
-    }//END
+            //
+            override fun onFailure(call: Call<AvailableBooking>, t: Throwable) {
+                Toast.makeText(context, "Error Fetching Book!", Toast.LENGTH_SHORT).show()
+                Log.e("Error Fetching Book", t.message.toString())
+            }
+        })
+    }
 }
+
