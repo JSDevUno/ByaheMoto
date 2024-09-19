@@ -1,4 +1,4 @@
-    package com.example.byahemoto.models
+package com.example.byahemoto.models
 
 data class BookingResponse(
     val bookingId: Int,
