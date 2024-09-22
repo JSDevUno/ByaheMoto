@@ -107,7 +107,7 @@ object RetrofitInstance {
 
     private fun getRetrofit(context: Context): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8000")
+            .baseUrl("https://fond-beagle-prime.ngrok-free.app")
             .client(getClient(context))
             .addConverterFactory(GsonConverterFactory.create())
             .build()

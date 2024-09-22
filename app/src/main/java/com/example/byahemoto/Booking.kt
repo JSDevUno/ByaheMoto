@@ -119,8 +119,10 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 location?.let {
                     currentLocation = LatLng(it.latitude, it.longitude)
+
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation!!, 12f))
                     Toast.makeText(this, "Your location fetched", Toast.LENGTH_SHORT).show()
+
                 } ?: run {
                     Toast.makeText(this, "Unable to get current location.", Toast.LENGTH_SHORT).show()
                 }
@@ -134,10 +136,12 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
         val paymentMethod = paymentMethodSpinner.selectedItem.toString()
         val locationToText = findViewById<EditText>(R.id.locationToTxt).text.toString()
 
+
         if (locationToText.isEmpty()) {
             Toast.makeText(this, "Please enter a drop-off location", Toast.LENGTH_SHORT).show()
             return
         }
+
 
         currentLocation?.let { currentLoc ->
 
@@ -196,11 +200,13 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
                     Toast.makeText(this, "Failed to get coordinates for the drop-off location", Toast.LENGTH_SHORT).show()
                     Log.e("CreateBooking", "Geocoding failed for location: $locationToText")
                 }
+
             }
         } ?: run {
             Toast.makeText(this, "Current location not available", Toast.LENGTH_SHORT).show()
             Log.e("CreateBooking", "Current location is null")
         }
+
     }
 
     private fun geocodeLocation(address: String, callback: (LatLng?) -> Unit) {

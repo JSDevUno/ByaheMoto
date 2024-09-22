@@ -65,6 +65,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 if (location != null) {
                     val currentLocation = LatLng(location.latitude, location.longitude)
                     showLocation(currentLocation)
+
                 } else {
                     Toast.makeText(requireContext(), "Unable to get current location.", Toast.LENGTH_SHORT).show()
                 }
