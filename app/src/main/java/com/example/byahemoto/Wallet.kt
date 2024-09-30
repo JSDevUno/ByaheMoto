@@ -1,5 +1,6 @@
 package com.example.byahemoto
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,7 +11,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
+import com.example.byahemoto.models.GetProfileResponse
+import com.example.byahemoto.network.RetrofitInstance
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class Wallet : AppCompatActivity() {
 
@@ -46,7 +52,6 @@ class Wallet : AppCompatActivity() {
         }
 
         walletTextView = findViewById(R.id.walletValue)
-
 
         val userId = getCurrentUserId()
         if (userId == null) {
@@ -88,12 +93,29 @@ class Wallet : AppCompatActivity() {
     }
 
 
+    @SuppressLint("DefaultLocale")
     private fun loadWalletBalanceForCurrentUser(userId: Int) {
         Log.d(TAG, "Loading wallet balance for user ID: $userId")
-        val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        val walletBalance = sharedPref.getFloat("wallet_balance_$userId", 0.0f)
-        walletTextView.text = String.format("%.2f", walletBalance)
-        Log.d(TAG, "Loaded wallet balance: $walletBalance")
+
+        // Get the wallet balance from the server
+        getTokenFromSharedPreferences()?.let {
+            RetrofitInstance.getAuthService(this).getUserProfile(it).enqueue(object :
+                Callback<GetProfileResponse> {
+                override fun onResponse(call: Call<GetProfileResponse>, response: Response<GetProfileResponse>) {
+                    if (response.isSuccessful) {
+                        val getProfileResponse = response.body()
+                        val walletBalance = getProfileResponse?.data?.wallet?.balance?.toDouble() ?: 0.0
+                        walletTextView.text = String.format("%.2f", walletBalance)
+                        Log.d(TAG, "Loaded wallet balance: $walletBalance")
+                    } else {
+                        Log.e("GetProfileResponse", "Response failed: ${response.errorBody()}")
+                    }
+                }
+                override fun onFailure(call: Call<GetProfileResponse>, t: Throwable) {
+                    Log.e("GetProfileResponse", "Request failed: ${t.message}")
+                }
+            })
+        }
     }
 
 
@@ -126,5 +148,10 @@ class Wallet : AppCompatActivity() {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val userId = sharedPref.getInt("user_id", -1)
         return if (userId == -1) null else userId
+    }
+
+    private fun getTokenFromSharedPreferences(): String? {
+        val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        return sharedPref.getString("access_token", null)
     }
 }

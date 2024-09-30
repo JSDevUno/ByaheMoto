@@ -12,6 +12,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.byahemoto.models.BookingDetails
 import com.example.byahemoto.models.BookingRequest
 import com.example.byahemoto.models.BookingResponse
 import com.example.byahemoto.models.DriverLocationResponse
@@ -147,7 +148,6 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
 
             // Log the current location
             Log.d("CreateBooking", "Current location: $currentLoc")
-
             geocodeLocation(locationToText) { locationToLatLng ->
                 if (locationToLatLng != null) {
 
@@ -164,19 +164,19 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
                     // Log the booking request
                     Log.d("BookingRequest", Gson().toJson(bookingRequest))
 
-                    RetrofitInstance.getAuthService(this).createBooking(bookingRequest).enqueue(object : Callback<BookingResponse> {
-                        override fun onResponse(call: Call<BookingResponse>, response: Response<BookingResponse>) {
+                    RetrofitInstance.getAuthService(this).createBooking(bookingRequest).enqueue(object : Callback<BookingDetails> {
+                        override fun onResponse(call: Call<BookingDetails>, response: Response<BookingDetails>) {
                             if (response.isSuccessful) {
                                 val bookingResponse = response.body()
                                 bookingResponse?.let {
                                     // Log the booking response
-                                    Log.d("BookingResponse", Gson().toJson(it))
+                                    Log.d("BookingResponse",  Gson().toJson(it))
 
-                                    bookingId = it.bookingId
+                                    bookingId = it.data.id
                                     bookingButton.text = "Booking in progress..."
                                     bookingButton.isEnabled = false
 
-                                    val fare = it.fare
+                                    val fare = it.data.fare
                                     amountTextView.text = fare.toString()
 
                                     trackBookingStatus()
@@ -187,11 +187,11 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
                                 }
                             } else {
                                 Toast.makeText(this@Booking, "Failed to create booking", Toast.LENGTH_SHORT).show()
-                                Log.e("BookingResponse", "Error: ${response.errorBody()?.string()}")
+                                Log.e("FailedBookingResponse", "Error: ${response.errorBody()?.string()}")
                             }
                         }
 
-                        override fun onFailure(call: Call<BookingResponse>, t: Throwable) {
+                        override fun onFailure(call: Call<BookingDetails>, t: Throwable) {
                             Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
                             Log.e("BookingResponse", "Failure: ${t.message}", t)
                         }
@@ -242,16 +242,17 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 bookingId?.let { id ->
-                    RetrofitInstance.getAuthService(this@Booking).getBookingDetails(id).enqueue(object : Callback<BookingResponse> {
-                        override fun onResponse(call: Call<BookingResponse>, response: Response<BookingResponse>) {
+                    val token = getSharedPreferences("user", MODE_PRIVATE).getString("token", "") ?: ""
+                    RetrofitInstance.getAuthService(this@Booking).getBookingDetails(id).enqueue(object : Callback<BookingDetails> {
+                        override fun onResponse(call: Call<BookingDetails>, response: Response<BookingDetails>) {
                             if (response.isSuccessful) {
-                                val status = response.body()?.status
+                                val status = response.body()?.data?.status
                                 statusPanel.text = status ?: "Unknown"
 
                                 // Check if the driver has accepted the booking
                                 if (status == "Accepted" || status == "Picked Up") {
                                     // Update the fare when the driver accepts the booking
-                                    val fare = response.body()?.fare ?: 0.0
+                                    val fare = response.body()?.data?.fare ?: 0.0
                                     amountTextView.text = fare.toString()
                                 }
 
@@ -260,11 +261,11 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
                                     handler.removeCallbacksAndMessages(null)
                                 }
                             } else {
-                                Toast.makeText(this@Booking, "Failed to track booking status", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@Booking, "FFailed to track booking status", Toast.LENGTH_SHORT).show()
                             }
                         }
 
-                        override fun onFailure(call: Call<BookingResponse>, t: Throwable) {
+                        override fun onFailure(call: Call<BookingDetails>, t: Throwable) {
                             Toast.makeText(this@Booking, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
                         }
                     })
@@ -364,6 +365,7 @@ class Booking : AppCompatActivity(), OnMapReadyCallback {
                         override fun onResponse(call: Call<DriverLocationResponse>, response: Response<DriverLocationResponse>) {
                             if (response.isSuccessful) {
                                 val locationResponse = response.body()
+                                Log.d("DriverLocation", Gson().toJson(locationResponse))
                                 locationResponse?.let {
                                     driverLocation = LatLng(it.lat, it.lng)
                                     updateDriverLocationOnMap(driverLocation!!)

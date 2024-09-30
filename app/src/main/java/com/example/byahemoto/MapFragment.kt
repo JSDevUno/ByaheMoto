@@ -2,6 +2,7 @@ package com.example.byahemoto
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -26,12 +27,15 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.IOException
+import java.util.Locale
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val batangas = LatLng(13.7563, 121.0604)
+    private val passengerCurrentLocation = LatLng(14.3318211, 120.8572246)
+    private val passengerDestinationLocation = LatLng(14.6170, 120.9670)
     private val apiKey = "AIzaSyA7TdMg8XawtIx9QX1uDGl2H_CSJU7IKpE"
 
     override fun onCreateView(
@@ -73,12 +77,28 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun getPlaceName(latLng: LatLng): String {
+        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+        return try {
+            val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+            if (!addresses.isNullOrEmpty()) {
+                val address = addresses[0]
+                address.getAddressLine(0) ?: "Unknown Location"
+            } else {
+                "Unknown Location"
+            }
+        } catch (e: IOException) {
+            Log.i("GeocodingError", "Geocoding service not available")
+            "Geocoding service not available"
+        }
+    }
+
     private fun showLocation(currentLocation: LatLng) {
         googleMap.clear()
-        googleMap.addMarker(MarkerOptions().position(currentLocation).title("Current Location"))
-        googleMap.addMarker(MarkerOptions().position(batangas).title("Batangas"))
+        googleMap.addMarker(MarkerOptions().position(passengerCurrentLocation).title("Current Location"))
+        googleMap.addMarker(MarkerOptions().position(passengerDestinationLocation).title(getPlaceName(passengerDestinationLocation)))
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 10f))
-        fetchDirections(currentLocation, batangas)
+        fetchDirections(passengerCurrentLocation, passengerDestinationLocation)
     }
 
     private fun fetchDirections(start: LatLng, end: LatLng) {

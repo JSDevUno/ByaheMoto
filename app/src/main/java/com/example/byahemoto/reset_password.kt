@@ -1,7 +1,9 @@
 package com.example.byahemoto
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -13,7 +15,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class reset_password : AppCompatActivity() {
-
+    private lateinit var token: String
     private lateinit var newPasswordEditText: EditText
     private lateinit var confirmPasswordEditText: EditText
     private lateinit var resetPasswordButton: Button
@@ -37,12 +39,12 @@ class reset_password : AppCompatActivity() {
             } else if (!isPasswordValid(newPassword)) {
                 Toast.makeText(this, "Password is too weak", Toast.LENGTH_SHORT).show()
             } else {
-                val token = intent.getStringExtra("token")
-                if (token != null) {
-                    resetPassword(token, newPassword)
-                } else {
-                    Toast.makeText(this, "Token is missing or invalid", Toast.LENGTH_SHORT).show()
-                }
+                // Get the token from the deep link
+                val data: Uri? = intent?.data
+                token = data?.getQueryParameter("token").orEmpty()
+
+                Log.d("RESET PASSWORD DATA", "URI DATA: $data")
+                resetPassword(token, newPassword)
             }
         }
     }
