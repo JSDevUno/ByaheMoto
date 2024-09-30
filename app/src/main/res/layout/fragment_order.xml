@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_order"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".OrderFragment">
@@ -15,14 +16,19 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="visible">
-
+<!--            <include-->
+<!--                android:id="@+id/cardViewContainer"-->
+<!--                layout="@layout/layout_panels"-->
+<!--                android:visibility="visible" />-->
+            <LinearLayout
+                android:id="@+id/cardViewContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible" />
 
         </LinearLayout>
-    </ScrollView>
 
-    <include
-        android:id="@+id/cardViewContainer"
-        layout="@layout/layout_panels"
-        android:visibility="visible" />
+    </ScrollView>
 
 </FrameLayout>

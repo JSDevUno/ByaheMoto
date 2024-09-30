@@ -1,10 +1,12 @@
 package com.example.byahemoto.network
 
 import com.example.byahemoto.models.AvailableBooking
+import com.example.byahemoto.models.BookingDetails
 import com.example.byahemoto.models.BookingRequest
-import com.example.byahemoto.models.BookingResponse
 import com.example.byahemoto.models.DriverLocationResponse
+import com.example.byahemoto.models.GetProfileResponse
 import com.example.byahemoto.models.LoginResponse
+import com.example.byahemoto.models.OrderRequest
 import com.example.byahemoto.models.OrderResponse
 import com.example.byahemoto.models.ProfileUpdate
 import com.example.byahemoto.models.ProfileUpdateResponse
@@ -13,16 +15,13 @@ import com.example.byahemoto.models.RefreshTokenResponse
 import com.example.byahemoto.models.RegisterRequest
 import com.example.byahemoto.models.ResetPasswordRequest
 import com.example.byahemoto.models.RideHistoryResponse
-import com.example.byahemoto.models.SignupRequest
 import com.example.byahemoto.models.SignupResponse
-import com.example.byahemoto.models.Transaction
 import com.example.byahemoto.models.TransactionResponse
+import com.example.byahemoto.models.UpdateDriverLocation
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -45,9 +44,13 @@ interface AuthService {
 
     @POST("/auth/refresh-token")
     fun refreshToken(
-        @Body request: RefreshTokenRequest
+        @Body request: RefreshTokenRequest //@Body request: String?
     ): Call<RefreshTokenResponse>
 
+    @GET("/profile/")
+    fun getUserProfile(
+        @Header("Authorization") token: String
+    ): Call<GetProfileResponse>
 
     @PUT("/profile/")
     fun updateProfile(
@@ -91,12 +94,34 @@ interface AuthService {
 
     // Create a new booking
     @POST("/bookings/")
-    fun createBooking(@Body bookingRequest: BookingRequest): Call<BookingResponse>
+    fun createBooking(@Body bookingRequest: BookingRequest): Call<BookingDetails>
+
+    // Accept a booking
+    @PUT("/bookings/{booking_id}/accept")
+    fun acceptBooking(
+        @Header("Authorization") token: String,
+        @Path("booking_id") bookingId: Int
+    ): Call<Void>
+
+    // Reject a booking
+    @PUT("/bookings/{booking_id}/reject")
+    fun rejectBooking(
+        @Header("Authorization") token: String,
+        @Path("booking_id") bookingId: Int
+    ): Call<Void>
 
     // Cancel a booking
     @PUT("/bookings/{booking_id}/cancel")
     fun cancelBooking(
+        @Header("Authorization") token: String,
         @Path("booking_id") bookingId: Int
+    ): Call<Void>
+
+    // Show driver's current location
+    @POST("/bookings/location")
+    fun locateDriver(
+        @Header("Authorization") token: String,
+        @Body requestBody: UpdateDriverLocation
     ): Call<Void>
 
     // Get real-time driver location updates
@@ -105,11 +130,18 @@ interface AuthService {
         @Path("booking_id") bookingId: Int
     ): Call<DriverLocationResponse>
 
+    //Booking Details Beta
+    @GET("/bookings/{booking_id}")
+    fun getDisplayBookingDetails(
+        @Header("Authorization") token: String,
+        @Path("booking_id") bookingId: Int
+    ): Call<BookingDetails>
+
     //Booking Details
     @GET("/bookings/{booking_id}")
     fun getBookingDetails(
         @Path("booking_id") bookingId: Int
-    ): Call<BookingResponse>
+    ): Call<BookingDetails>
 
     //Ride History
 
@@ -128,8 +160,8 @@ interface AuthService {
     @POST("/profile/top-up")
     fun topUp(
         @Header("Authorization") token: String,
-        @Body requestBody: Map<String, Double>
-    ): Call<OrderResponse>  // Update to use OrderResponse
+        @Body requestBody: OrderRequest // Map<String, Double>
+    ): Call<OrderResponse>
 
     @POST("/profile/top-up/{order_id}/capture")
     fun captureTopUp(

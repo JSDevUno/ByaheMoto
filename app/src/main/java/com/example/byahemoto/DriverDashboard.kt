@@ -2,6 +2,7 @@ package com.example.byahemoto
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -23,6 +24,11 @@ class DriverDashboard : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_current -> {
                     loadFragment(CurrentFragment())
+                    // Access the shared preferences to reset the bookingID to zero
+                    val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+                    val editor = sharedPref.edit()
+                    editor.putInt("bookingId", 0)
+                    editor.apply()
                     updateOrdersTextView("CURRENT LOCATION")
                     true
                 }
@@ -49,10 +55,22 @@ class DriverDashboard : AppCompatActivity() {
                 else -> false
             }
         }
+        // Check the intent for a specific fragment to navigate to
+        val navigateTo = intent.getStringExtra("navigateTo")
 
         if (savedInstanceState == null) {
-            loadFragment(CurrentFragment())
+
+            when (navigateTo) {
+                "nav_current" -> {
+                    loadFragment(CurrentFragment())
+                }
+                else -> {
+                    // Default behavior, load the CurrentFragment
+                    loadFragment(CurrentFragment())
+                }
+            }
         }
+
     }
 
     private fun loadFragment(fragment: Fragment) {

@@ -83,6 +83,7 @@ class EditProfile : AppCompatActivity() {
 
     private fun saveProfileChanges() {
         val token = getTokenFromPreferences()
+        Log.d(TAG, "Tokenz: $token")
         val phoneNumber = phoneNumberEditText.text.toString().trim()
 
         if (phoneNumber.isEmpty()) {

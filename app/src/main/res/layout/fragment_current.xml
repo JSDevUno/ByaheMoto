@@ -14,7 +14,7 @@
         android:layout_height="match_parent" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+        android:id="@+id/selectedBookingDetailsID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -36,13 +36,15 @@
                     android:layout_height="match_parent"
                     android:src="@drawable/baseline_my_location_driver"
                     android:layout_marginLeft="10dp"/>
+
                 <TextView
+                    android:id="@+id/fromLocationText"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Batangas"
+                    android:layout_height="match_parent"
                     android:padding="16dp"
+                    android:text="Batangas"
                     android:textColor="@color/black"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -55,13 +57,15 @@
                     android:layout_height="match_parent"
                     android:src="@drawable/baseline_location_on_24"
                     android:layout_marginLeft="10dp"/>
+
                 <TextView
+                    android:id="@+id/toLocationText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bauan"
                     android:padding="16dp"
+                    android:text="Bauan"
                     android:textColor="@color/black"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -69,20 +73,24 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="-20dp">
+
                 <TextView
+                    android:id="@+id/distanceText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="16dp"
                     android:text="1.2km"
-                    android:padding="16dp"
                     android:textColor="@color/black"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
+
                 <TextView
+                    android:id="@+id/arrivalTimeText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2 min."
                     android:padding="16dp"
+                    android:text="2 min."
                     android:textColor="@color/black"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -190,14 +198,16 @@
                         android:padding="16dp"
                         android:textColor="@color/black"
                         android:textSize="16sp"/>
+
                     <TextView
+                        android:id="@+id/clientNameText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Carl Ysaac"
                         android:layout_marginTop="-30dp"
                         android:padding="16dp"
+                        android:text="Carl Ysaac"
                         android:textColor="@color/main2"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -211,7 +221,9 @@
                         android:padding="16dp"
                         android:textColor="@color/black"
                         android:textSize="16sp"/>
+
                     <TextView
+                        android:id="@+id/passengerStatusText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="0dp"

@@ -1,18 +1,25 @@
 package com.example.byahemoto
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.byahemoto.models.OrderRequest
 import com.example.byahemoto.models.OrderResponse
+import com.example.byahemoto.network.ApiClient
+import com.example.byahemoto.network.AuthService
 import com.example.byahemoto.network.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class Topup : AppCompatActivity() {
 
@@ -39,20 +46,30 @@ class Topup : AppCompatActivity() {
     }
 
     private fun createPayPalOrder(amount: Double) {
-        val requestBody = mapOf("amount" to amount)
-        RetrofitInstance.getAuthService(this).topUp(getTokenForCurrentUser(), requestBody)
+//        val requestBody = mapOf("amount" to amount)
+        val orderRequest = OrderRequest(amount)
+        RetrofitInstance.getAuthService(this).topUp("Bearer ${getTokenForCurrentUser()}", orderRequest)
             .enqueue(object : Callback<OrderResponse> {
                 override fun onResponse(call: Call<OrderResponse>, response: Response<OrderResponse>) {
                     if (response.isSuccessful) {
-                        val approvalUrl = response.body()?.data?.approvalUrl
-                        orderId = response.body()?.data?.orderId ?: ""
+                        val approvalUrl = response.body()?.data?.links?.find { it.rel == "approve" }?.href
+                        orderId = response.body()?.data?.id ?: ""
+
                         approvalUrl?.let {
                             openWebView(it)
                         }
+
+
                     } else {
                         if (response.code() == 401) {
                             // lalabas to pag expired
-                            Toast.makeText(this@Topup, "Session expired. Retrying with a refreshed token...", Toast.LENGTH_SHORT).show()
+                            //Toast.makeText(this@Topup, "Session expired. Retrying with a refreshed token...", Toast.LENGTH_SHORT).show()
+
+                            // It returns the actual cause of 401 error
+                            val errorBody = response.errorBody()?.string()
+                            val errorMessage = errorBody?.substringAfter("message\":\"")?.substringBefore("\"")
+                            Toast.makeText(this@Topup, errorMessage, Toast.LENGTH_SHORT).show()
+
                         } else {
                             Toast.makeText(this@Topup, "Failed to create PayPal order", Toast.LENGTH_SHORT).show()
                         }
@@ -65,6 +82,7 @@ class Topup : AppCompatActivity() {
             })
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private fun openWebView(approvalUrl: String) {
         webView = WebView(this)
         setContentView(webView)
@@ -72,7 +90,9 @@ class Topup : AppCompatActivity() {
         webView.settings.javaScriptEnabled = true
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView, url: String) {
+                Log.d("WEBVIEW", "URL: $url")
                 if (url.contains("return")) {
+                    Log.d("WEBVIEW", "Payment Captured")
                     capturePayPalOrder()
                 } else if (url.contains("cancel")) {
                     Toast.makeText(this@Topup, "Payment cancelled", Toast.LENGTH_SHORT).show()
@@ -84,17 +104,17 @@ class Topup : AppCompatActivity() {
     }
 
     private fun capturePayPalOrder() {
-        RetrofitInstance.getAuthService(this).captureTopUp(getTokenForCurrentUser(), orderId)
+        RetrofitInstance.getAuthService(this).captureTopUp("Bearer ${getTokenForCurrentUser()}", orderId)
             .enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@Topup, "Top-up successful!", Toast.LENGTH_SHORT).show()
                         returnToWalletActivity()
                     } else {
-                        Toast.makeText(this@Topup, "Failed to capture payment", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@Topup, "Failed to capture payment", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
-
                 override fun onFailure(call: Call<Void>, t: Throwable) {
                     Toast.makeText(this@Topup, "Error capturing payment: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
