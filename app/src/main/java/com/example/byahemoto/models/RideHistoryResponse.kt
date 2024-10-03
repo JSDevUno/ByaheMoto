@@ -3,17 +3,23 @@ package com.example.byahemoto.models
 data class RideHistoryResponse(
     val success: Boolean,
     val message: String,
-    val data: List<RideDetails>
+    val data: List<RideData>
 )
 
-data class RideDetails(
-    val locationFrom: RideLocationData,
-    val locationTo: RideLocationData,
-    val timestamp: String
+data class RideData(
+    val id: Int,
+    val userId: Int,
+    val modeOfPayment: String,
+    val vehicleType: String,
+    val fare: Double,
+    val locationFrom: Location,
+    val locationTo: Location,
+    val status: String,
+    val createdAt: String,
+    val updatedAt: String
 )
 
-data class RideLocationData(
+data class Location(
     val lat: Double,
-    val lng: Double,
-    val address: String?
+    val lng: Double
 )

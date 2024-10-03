@@ -12,9 +12,11 @@ import com.example.byahemoto.models.ProfileUpdate
 import com.example.byahemoto.models.ProfileUpdateResponse
 import com.example.byahemoto.models.RefreshTokenRequest
 import com.example.byahemoto.models.RefreshTokenResponse
+import com.example.byahemoto.models.RegisterDriverRequest
 import com.example.byahemoto.models.RegisterRequest
 import com.example.byahemoto.models.ResetPasswordRequest
 import com.example.byahemoto.models.RideHistoryResponse
+import com.example.byahemoto.models.SignupDriverResponse
 import com.example.byahemoto.models.SignupResponse
 import com.example.byahemoto.models.TransactionResponse
 import com.example.byahemoto.models.UpdateDriverLocation
@@ -33,7 +35,14 @@ import retrofit2.http.Path
 interface AuthService {
 
     @POST("/auth/register")
-    fun register(@Body request: RegisterRequest): Call<SignupResponse>
+    fun registerDriver(
+        @Body request: RegisterDriverRequest
+    ): Call<SignupDriverResponse>
+
+    @POST("/auth/register")
+    fun register(
+        @Body request: RegisterRequest
+    ): Call<SignupResponse>
 
     @Multipart
     @PUT("/profile/picture")

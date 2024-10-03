@@ -1,6 +1,6 @@
 package com.example.byahemoto
 
-import android.content.Intent
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ListView
@@ -8,12 +8,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.byahemoto.models.TransactionResponse
 import com.example.byahemoto.network.RetrofitInstance
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import android.content.Context
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 class TransacHistory : AppCompatActivity() {
 
@@ -23,11 +26,12 @@ class TransacHistory : AppCompatActivity() {
     private val transactionList = mutableListOf<String>()
     private val TAG = "TransacHistory"
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_transaction_history)
 
-        listView = findViewById(R.id.list_view)
+        listView = findViewById(R.id.commuter_transaction_history)
         transactionAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, transactionList)
         listView.adapter = transactionAdapter
 
@@ -39,19 +43,23 @@ class TransacHistory : AppCompatActivity() {
 
         if (token != null) {
             RetrofitInstance.getAuthService(this).getTransactionHistory("Bearer $token").enqueue(object : Callback<TransactionResponse> {
+                @RequiresApi(Build.VERSION_CODES.O)
                 override fun onResponse(call: Call<TransactionResponse>, response: Response<TransactionResponse>) {
                     if (response.isSuccessful) {
                         val transactionResponse = response.body()
-                        val transactions = transactionResponse?.transactions
+                        Log.d("TRANSACTION RESPONSE", "Transaction response: $transactionResponse")
+                        val transactions = transactionResponse?.data
 
                         if (transactions.isNullOrEmpty()) {
                             transactionList.add("No transactions available")
                         } else {
                             transactions.forEach { transaction ->
                                 val transactionEntry = when (transaction.type) {
-                                    "send_money" -> "Send Money: ${transaction.amount}"
-                                    "topup" -> "Top-up: ${transaction.amount}"
-                                    else -> transaction.description ?: "Transaction"
+                                    "payment" -> "₱${transaction.amount} credited for trip completed on " +
+                                            "${formatDate(transaction.createdAt)}, at ${formatTime(transaction.createdAt)}."
+                                    "credit" -> "You successfully topped up ₱${transaction.amount} to your account on " +
+                                            "${formatDate(transaction.createdAt)}, at ${formatTime(transaction.createdAt)}."
+                                    else -> transaction.type
                                 }
                                 transactionList.add(transactionEntry)
                             }
@@ -73,6 +81,19 @@ class TransacHistory : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun formatDate(dateString: String): String {
+        val zonedDateTime = ZonedDateTime.parse(dateString)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        return zonedDateTime.format(formatter)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun formatTime(dateString: String): String {
+        val zonedDateTime = ZonedDateTime.parse(dateString)
+        val formatter = DateTimeFormatter.ofPattern("hh:mm a")
+        return zonedDateTime.format(formatter)
+    }
 
     private fun getTokenFromSharedPreferences(): String? {
         val sharedPref = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)

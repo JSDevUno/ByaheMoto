@@ -3,13 +3,15 @@ package com.example.byahemoto
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.byahemoto.models.RegisterRequest
-import com.example.byahemoto.models.SignupResponse
+import com.example.byahemoto.models.RegisterDriverRequest
+import com.example.byahemoto.models.SignupDriverResponse
 import com.example.byahemoto.network.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
@@ -24,22 +26,25 @@ class SignupDriver : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var confirmPasswordEditText: EditText
     private lateinit var createAccButton: Button
-    private lateinit var createPriorityAccButtonDriver: Button
     private lateinit var backBtnDriver: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup_driver)
 
+        val vehicleTypeSpinner: Spinner = findViewById(R.id.vehicle_type_spinner)
+        val vehicleTypes = arrayOf("EMC","ECART","MOTORCYCLE","TRICYCLE")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, vehicleTypes)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        vehicleTypeSpinner.adapter = adapter
+
         emailEditText = findViewById(R.id.emailDriver)
         fullNameEditText = findViewById(R.id.fullNameDriver)
         usernameEditText = findViewById(R.id.usernameDriver)
         passwordEditText = findViewById(R.id.passwordDriver1)
         confirmPasswordEditText = findViewById(R.id.confirmPasswordDriver1)
-        createPriorityAccButtonDriver = findViewById(R.id.verifyAcc)
         createAccButton = findViewById(R.id.createAccDriver)
         backBtnDriver = findViewById(R.id.backBtnDriver)
-
         createAccButton.setOnClickListener {
             val email = emailEditText.text.toString().trim()
             val fullName = fullNameEditText.text.toString().trim()
@@ -48,12 +53,8 @@ class SignupDriver : AppCompatActivity() {
             val confirmPassword = confirmPasswordEditText.text.toString().trim()
 
             if (validateInputs(email, fullName, username, password, confirmPassword)) {
-                register(email, fullName, username, password, confirmPassword)
+                registerDriver(email, fullName, username, password, confirmPassword, vehicleTypeSpinner.selectedItem.toString())
             }
-        }
-
-        createPriorityAccButtonDriver.setOnClickListener {
-            navigateToSignup()
         }
         backBtnDriver.setOnClickListener {
             onBackPressed()
@@ -107,30 +108,32 @@ class SignupDriver : AppCompatActivity() {
         return true
     }
 
-    private fun register(
+    private fun registerDriver(
         email: String,
         fullName: String,
         username: String,
         password: String,
-        confirmPassword: String
+        confirmPassword: String,
+        vehicleType: String
     ) {
         val registrationType = "driver" // Set registration type to "driver"
-        val registerRequest = RegisterRequest(
-            full_name = fullName,
+        val registerRequest = RegisterDriverRequest(
+            fullName = fullName,
             username = username,
             email = email,
             password = password,
-            confirm_password = confirmPassword,
-            registration_type = registrationType
+            confirmPassword = confirmPassword,
+            registrationType = registrationType,
+            vehicleType = vehicleType
         )
         Log.d("SignupDriver", "Register Request: $registerRequest")
 
         // Ensure context is passed to RetrofitInstance
-        RetrofitInstance.getAuthService(this).register(registerRequest)
-            .enqueue(object : Callback<SignupResponse> {
+        RetrofitInstance.getAuthService(this).registerDriver(registerRequest)
+            .enqueue(object : Callback<SignupDriverResponse> {
                 override fun onResponse(
-                    call: Call<SignupResponse>,
-                    response: Response<SignupResponse>
+                    call: Call<SignupDriverResponse>,
+                    response: Response<SignupDriverResponse>
                 ) {
                     if (response.isSuccessful) {
                         Toast.makeText(
@@ -155,7 +158,7 @@ class SignupDriver : AppCompatActivity() {
                     }
                 }
 
-                override fun onFailure(call: Call<SignupResponse>, t: Throwable) {
+                override fun onFailure(call: Call<SignupDriverResponse>, t: Throwable) {
                     Log.e("SignupDriver", "Error during registration", t)
                     Toast.makeText(
                         this@SignupDriver,
@@ -164,10 +167,5 @@ class SignupDriver : AppCompatActivity() {
                     ).show()
                 }
             })
-    }
-
-    private fun navigateToSignup() {
-        val intent = Intent(this, PriorityDriver::class.java)
-        startActivity(intent)
     }
 }

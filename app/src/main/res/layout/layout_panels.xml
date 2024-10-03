@@ -199,30 +199,10 @@
                         android:layout_weight="1"
                         android:background="@drawable/nav_shape"
                         android:gravity="center"
-                        android:text="Map"
+                        android:text="View"
                         android:textColor="@color/main2"
                         android:textSize="18sp" />
 
-                    <TextView
-                        android:id="@+id/rejectButton"
-                        android:layout_width="120dp"
-                        android:layout_height="40dp"
-                        android:layout_marginRight="1dp"
-                        android:background="@drawable/nav_shape"
-                        android:gravity="center"
-                        android:text="Reject"
-                        android:textColor="@color/main2"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:id="@+id/acceptButton"
-                        android:layout_width="120dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/nav_shape"
-                        android:gravity="center"
-                        android:text="Accept"
-                        android:textColor="@color/main2"
-                        android:textSize="18sp" />
                 </LinearLayout>
 
             </LinearLayout>

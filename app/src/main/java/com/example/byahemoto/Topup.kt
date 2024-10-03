@@ -12,14 +12,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.byahemoto.models.OrderRequest
 import com.example.byahemoto.models.OrderResponse
-import com.example.byahemoto.network.ApiClient
-import com.example.byahemoto.network.AuthService
 import com.example.byahemoto.network.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class Topup : AppCompatActivity() {
 
@@ -56,20 +52,15 @@ class Topup : AppCompatActivity() {
                         orderId = response.body()?.data?.id ?: ""
 
                         approvalUrl?.let {
+                            Toast.makeText(this@Topup, "Please wait...", Toast.LENGTH_LONG).show()
                             openWebView(it)
                         }
-
-
                     } else {
                         if (response.code() == 401) {
-                            // lalabas to pag expired
-                            //Toast.makeText(this@Topup, "Session expired. Retrying with a refreshed token...", Toast.LENGTH_SHORT).show()
-
                             // It returns the actual cause of 401 error
                             val errorBody = response.errorBody()?.string()
                             val errorMessage = errorBody?.substringAfter("message\":\"")?.substringBefore("\"")
                             Toast.makeText(this@Topup, errorMessage, Toast.LENGTH_SHORT).show()
-
                         } else {
                             Toast.makeText(this@Topup, "Failed to create PayPal order", Toast.LENGTH_SHORT).show()
                         }
