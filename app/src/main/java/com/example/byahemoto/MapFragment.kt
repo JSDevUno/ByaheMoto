@@ -2,7 +2,6 @@ package com.example.byahemoto
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -20,23 +19,11 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
-import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.Callback
-import retrofit2.Response
-import java.io.IOException
-import java.util.Locale
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val passengerCurrentLocation = LatLng(14.3318211, 120.8572246)
-    private val passengerDestinationLocation = LatLng(14.6170, 120.9670)
-    private val apiKey = "AIzaSyA7TdMg8XawtIx9QX1uDGl2H_CSJU7IKpE"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,7 +48,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             getCurrentLocation()
         }
     }
-
     private fun getCurrentLocation() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED) {
@@ -69,7 +55,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 if (location != null) {
                     val currentLocation = LatLng(location.latitude, location.longitude)
                     showLocation(currentLocation)
-
                 } else {
                     Toast.makeText(requireContext(), "Unable to get current location.", Toast.LENGTH_SHORT).show()
                 }
@@ -77,104 +62,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun getPlaceName(latLng: LatLng): String {
-        val geocoder = Geocoder(requireContext(), Locale.getDefault())
-        return try {
-            val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-            if (!addresses.isNullOrEmpty()) {
-                val address = addresses[0]
-                address.getAddressLine(0) ?: "Unknown Location"
-            } else {
-                "Unknown Location"
-            }
-        } catch (e: IOException) {
-            Log.i("GeocodingError", "Geocoding service not available")
-            "Geocoding service not available"
-        }
-    }
-
     private fun showLocation(currentLocation: LatLng) {
         googleMap.clear()
-        googleMap.addMarker(MarkerOptions().position(passengerCurrentLocation).title("Current Location"))
-        googleMap.addMarker(MarkerOptions().position(passengerDestinationLocation).title(getPlaceName(passengerDestinationLocation)))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 10f))
-        fetchDirections(passengerCurrentLocation, passengerDestinationLocation)
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15f))
     }
 
-    private fun fetchDirections(start: LatLng, end: LatLng) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://maps.googleapis.com/maps/api/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val service = retrofit.create(DirectionsApiService::class.java)
-
-        val origin = "${start.latitude},${start.longitude}"
-        val destination = "${end.latitude},${end.longitude}"
-
-        service.getDirections(origin, destination, apiKey).enqueue(object : Callback<DirectionsResponse> {
-            override fun onResponse(call: Call<DirectionsResponse>, response: Response<DirectionsResponse>) {
-                if (response.isSuccessful) {
-                    val directionsResponse = response.body()
-                    if (directionsResponse != null) {
-                        val polylineOptions = PolylineOptions().color(0xFF0000FF.toInt()).width(5f)
-                        directionsResponse.routes.firstOrNull()?.legs?.firstOrNull()?.steps?.forEach { step ->
-                            val points = step.polyline.points
-                            val decodedPath = decodePolyline(points)
-                            polylineOptions.addAll(decodedPath)
-                        }
-                        googleMap.addPolyline(polylineOptions)
-                    } else {
-                        Log.d("DirectionsError", "Directions response is null.")
-                    }
-                } else {
-                    Log.d("DirectionsError", "Directions API request failed with status code: ${response.code()}")
-                }
-            }
-
-            override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {
-                Log.e("DirectionsError", "Error fetching directions.", t)
-            }
-        })
-    }
-
-    private fun decodePolyline(encoded: String): List<LatLng> {
-        val poly = mutableListOf<LatLng>()
-        var index = 0
-        val len = encoded.length
-        var lat = 0
-        var lng = 0
-
-        while (index < len) {
-            var b: Int
-            var shift = 0
-            var result = 0
-
-            do {
-                b = encoded[index++].toInt() - 63
-                result = result or ((b and 0x1f) shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlat = if (result and 1 != 0) result.inv() shr 1 else result shr 1
-            lat += dlat
-            shift = 0
-            result = 0
-
-            do {
-                b = encoded[index++].toInt() - 63
-                result = result or ((b and 0x1f) shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlng = if (result and 1 != 0) result.inv() shr 1 else result shr 1
-            lng += dlng
-
-            val pLat = (lat / 1E5).toDouble()
-            val pLng = (lng / 1E5).toDouble()
-            poly.add(LatLng(pLat, pLng))
-        }
-
-        return poly
-    }
-
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

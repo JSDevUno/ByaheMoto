@@ -92,11 +92,9 @@ class Wallet : AppCompatActivity() {
         }
     }
 
-
     @SuppressLint("DefaultLocale")
     private fun loadWalletBalanceForCurrentUser(userId: Int) {
         Log.d(TAG, "Loading wallet balance for user ID: $userId")
-
         // Get the wallet balance from the server
         getTokenFromSharedPreferences()?.let {
             RetrofitInstance.getAuthService(this).getUserProfile(it).enqueue(object :
@@ -104,7 +102,7 @@ class Wallet : AppCompatActivity() {
                 override fun onResponse(call: Call<GetProfileResponse>, response: Response<GetProfileResponse>) {
                     if (response.isSuccessful) {
                         val getProfileResponse = response.body()
-                        val walletBalance = getProfileResponse?.data?.wallet?.balance?.toDouble() ?: 0.0
+                        val walletBalance = getProfileResponse?.data?.wallet?.balance ?: 0.0
                         walletTextView.text = String.format("%.2f", walletBalance)
                         Log.d(TAG, "Loaded wallet balance: $walletBalance")
                     } else {
@@ -118,7 +116,7 @@ class Wallet : AppCompatActivity() {
         }
     }
 
-
+    @SuppressLint("DefaultLocale")
     private fun updateWalletBalance(addedAmount: Double) {
         val userId = getCurrentUserId()
         if (userId != null) {

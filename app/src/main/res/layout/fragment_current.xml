@@ -42,7 +42,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:padding="16dp"
-                    android:text="Batangas"
+                    android:text="None"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -63,7 +63,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="Bauan"
+                    android:text="None"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -79,7 +79,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="1.2km"
+                    android:text="0km"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
@@ -88,7 +88,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="2 min."
+                    android:text="0hrs"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -127,23 +127,34 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="-10dp"
-                android:layout_marginBottom="-10dp">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/baseline_location_on_24"
-                    android:layout_marginStart="10dp" />
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Arrival Time"
-                    android:padding="16dp"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:gravity="end" />
+                    android:id="@+id/reject_button"
+                    android:layout_width="120dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center_vertical|end"
+                    android:background="@drawable/nav_shape"
+                    android:fontFamily="@font/archivo_black"
+                    android:gravity="center"
+                    android:text="REJECT"
+                    android:textColor="@color/main2"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/accept_button"
+                    android:layout_width="120dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center_vertical|end"
+                    android:background="@drawable/nav_shape"
+                    android:fontFamily="@font/archivo_black"
+                    android:gravity="center"
+                    android:text="ACCEPT"
+                    android:textColor="@color/main2"
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <View
@@ -177,50 +188,21 @@
                     android:layout_height="match_parent"
                     android:src="@drawable/baseline_star_24"
                     android:layout_marginStart="0dp" />
-            </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="-5dp"
-                android:layout_marginBottom="-5dp"
-                android:gravity="center_vertical">
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Client"
-                        android:layout_marginTop="-10dp"
-                        android:padding="16dp"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"/>
-
-                    <TextView
-                        android:id="@+id/clientNameText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="-30dp"
-                        android:padding="16dp"
-                        android:text="Carl Ysaac"
-                        android:textColor="@color/main2"
-                        android:textSize="16sp" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:gravity="center_vertical|end"
                     android:orientation="horizontal">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Status:"
                         android:layout_marginRight="-10dp"
                         android:padding="16dp"
+                        android:text="Status:"
                         android:textColor="@color/black"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp" />
 
                     <TextView
                         android:id="@+id/passengerStatusText"
@@ -230,7 +212,41 @@
                         android:background="@drawable/nav_shape"
                         android:paddingHorizontal="30dp"
                         android:paddingVertical="5dp"
-                        android:text="Arrived"
+                        android:text="None"
+                        android:textColor="@color/main2"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="-5dp"
+                android:layout_marginBottom="-5dp"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-10dp"
+                        android:padding="16dp"
+                        android:text="Client"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/clientNameText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-30dp"
+                        android:padding="16dp"
+                        android:text="None"
                         android:textColor="@color/main2"
                         android:textSize="16sp" />
                 </LinearLayout>

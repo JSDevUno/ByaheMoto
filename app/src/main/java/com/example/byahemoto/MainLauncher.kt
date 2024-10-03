@@ -3,12 +3,9 @@ package com.example.byahemoto
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.TextView
-import com.example.byahemoto.network.ApiClient
-import com.example.byahemoto.network.RetrofitInstance.getAuthService
 
 class MainLauncher : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

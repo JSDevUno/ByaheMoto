@@ -2,7 +2,6 @@ package com.example.byahemoto
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -24,11 +23,6 @@ class DriverDashboard : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_current -> {
                     loadFragment(CurrentFragment())
-                    // Access the shared preferences to reset the bookingID to zero
-                    val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
-                    val editor = sharedPref.edit()
-                    editor.putInt("bookingId", 0)
-                    editor.apply()
                     updateOrdersTextView("CURRENT LOCATION")
                     true
                 }

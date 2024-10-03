@@ -15,9 +15,15 @@ import retrofit2.Response
 import java.io.IOException
 import java.util.Locale
 import android.content.Context
-import android.location.Address
 import android.location.Geocoder
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import com.google.android.gms.maps.model.LatLng
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 class History : AppCompatActivity() {
 
@@ -30,7 +36,7 @@ class History : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ride_history)
 
-        listView = findViewById(R.id.list_view)
+        listView = findViewById(R.id.commuter_transaction_history)
         rideHistoryAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, rideHistoryList)
         listView.adapter = rideHistoryAdapter
 
@@ -55,38 +61,52 @@ class History : AppCompatActivity() {
                 else -> false
             }
         }
-
         // Load ride history from the server
         loadRideHistory()
     }
 
     private fun loadRideHistory() {
         val token = getTokenFromSharedPreferences() // Retrieve the token
-
         if (token != null) {
             RetrofitInstance.getAuthService(this).getRideHistory("Bearer $token").enqueue(object : Callback<RideHistoryResponse> {
+                @RequiresApi(Build.VERSION_CODES.O)
                 override fun onResponse(call: Call<RideHistoryResponse>, response: Response<RideHistoryResponse>) {
                     if (response.isSuccessful) {
                         val rideHistoryResponse = response.body()
                         val rideHistory = rideHistoryResponse?.data // This is the list of RideDetails
 
-                        if (rideHistory != null && rideHistory.isNotEmpty()) {
+                        if (!rideHistory.isNullOrEmpty()) {
                             rideHistory.forEach { ride ->
-                                val fromAddress = ride.locationFrom.address ?: getAddressFromLatLng(ride.locationFrom.lat, ride.locationFrom.lng)
-                                val toAddress = ride.locationTo.address ?: getAddressFromLatLng(ride.locationTo.lat, ride.locationTo.lng)
-                                val rideEntry = "FROM $fromAddress TO $toAddress"
+                                val fromAddress = ride.locationFrom
+                                val toAddress = ride.locationTo
+                                val from = getPlaceName(LatLng(fromAddress.lat, fromAddress.lng))
+                                val to = getPlaceName(LatLng(toAddress.lat, toAddress.lng))
+                                val paymentMethod = ride.modeOfPayment
+                                val fare = ride.fare
+                                val vehicle = ride.vehicleType
+                                val status = ride.status
+                                val rawDate = ride.createdAt
+                                val date = extractDate(rawDate)
+
+                                val rideEntry = """
+                                    Payment Method: $paymentMethod
+                                    Vehicle Type: $vehicle
+                                    Fare: ₱$fare
+                                    From: $from
+                                    To: $to
+                                    Status: $status
+                                    Date: $date
+                                """.trimIndent()
                                 rideHistoryList.add(rideEntry)
                             }
                         } else {
                             rideHistoryList.add("No ride history available.")
                         }
-
                         rideHistoryAdapter.notifyDataSetChanged()
                     } else {
                         Toast.makeText(this@History, "Failed to load ride history", Toast.LENGTH_SHORT).show()
                     }
                 }
-
                 override fun onFailure(call: Call<RideHistoryResponse>, t: Throwable) {
                     Toast.makeText(this@History, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -95,19 +115,30 @@ class History : AppCompatActivity() {
             Toast.makeText(this, "Token not available. Please login again.", Toast.LENGTH_SHORT).show()
         }
     }
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun extractDate(rideDetails: String): String {
+        val instant = Instant.parse(rideDetails)
+        val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"))
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val formattedDate = localDateTime.format(formatter)
 
+        return formattedDate ?: "Date not found"
+    }
 
-    private fun getAddressFromLatLng(lat: Double, lng: Double): String {
+    private fun getPlaceName(latLng: LatLng): String {
+
         val geocoder = Geocoder(this, Locale.getDefault())
         return try {
-            val addresses: List<Address>? = geocoder.getFromLocation(lat, lng, 1)
-            if (addresses != null && addresses.isNotEmpty()) {
-                addresses[0].getAddressLine(0)
+            val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+            if (!addresses.isNullOrEmpty()) {
+                val address = addresses[0]
+                address.getAddressLine(0) ?: "Unknown Location"
             } else {
                 "Unknown Location"
             }
         } catch (e: IOException) {
-            "Unknown Location"
+            Log.i("GeocodingError", "Geocoding service not available")
+            "Geocoding service not available"
         }
     }
 
