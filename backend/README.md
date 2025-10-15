@@ -36,7 +36,7 @@ app in the Philippines. This is the backend part of the application.
     ```
 5. Run the application
     ```bash
-    poetry run fastapi dev main.py # for development
+    poetry run fastapi dev main.py # for development.
     # or
-    poetry run fastapi run main.py # for production
+    poetry run fastapi run main.py # for production.
     ```
